@@ -25,6 +25,7 @@ fn copy_dir_all(src: &Path, dst: &Path) -> io::Result<()> {
 fn main() -> io::Result<()> {
     println!("cargo:rerun-if-changed=template/*");
     println!("cargo:rerun-if-changed=assets/*");
+    // println!("cargo:rerun-if-changed=build.rs");
 
     let out_dir = PathBuf::from(format! {"{}/../../../", env::var("OUT_DIR").unwrap()});
     let out_dir_path = out_dir.as_path();
