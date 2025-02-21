@@ -1,17 +1,21 @@
 mod constants;
 mod game_state;
 mod styles;
+mod text;
 
 use constants::*;
 use game_state::GameState;
 use macroquad::prelude::*;
+use text::get_text_params;
 
 #[macroquad::main("akj-21")]
 async fn main() {
     let mut game_state = GameState::new().await;
 
     loop {
-        game_state.mouse_pos = mouse_position();
+        game_state.mouse_pos = game_state
+            .camera
+            .screen_to_world(f32::Vec2::from(mouse_position()));
 
         if is_key_pressed(macroquad::input::KeyCode::Q) {
             miniquad::window::quit();
@@ -24,7 +28,8 @@ async fn main() {
         render_grid(&mut game_state);
         render_player(&mut game_state);
 
-        draw_text(
+        let text_params = get_text_params(16.0, &game_state.styles.colors.white);
+        draw_text_ex(
             format!(
                 "Tile: {}, {}",
                 game_state.tile_highlighted.x, game_state.tile_highlighted.y
@@ -32,8 +37,7 @@ async fn main() {
             .as_str(),
             20.0,
             20.0,
-            30.0,
-            game_state.styles.colors.white,
+            text_params,
         );
 
         next_frame().await
@@ -60,10 +64,10 @@ fn render_grid(game_state: &mut GameState) {
 
             let mut color = if is_dark { color_dark } else { color_light };
 
-            if mouse_pos.0 >= x
-                && mouse_pos.0 < x + cell_w
-                && mouse_pos.1 >= y
-                && mouse_pos.1 < y + cell_h
+            if mouse_pos.x >= x
+                && mouse_pos.x < x + cell_w
+                && mouse_pos.y >= y
+                && mouse_pos.y < y + cell_h
             {
                 game_state.tile_highlighted.x = i;
                 game_state.tile_highlighted.y = j;
