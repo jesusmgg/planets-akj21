@@ -4,6 +4,7 @@ use macroquad::{
     texture::{load_texture, set_default_filter_mode, FilterMode, Texture2D},
 };
 
+use crate::constants::*;
 use crate::styles::Styles;
 
 pub struct GameState {
@@ -53,8 +54,8 @@ impl GameState {
         let camera_rect = Rect {
             x: 0.0,
             y: 0.0,
-            w: 512.0,
-            h: 288.0,
+            w: SCREEN_W,
+            h: SCREEN_H,
         };
 
         let camera_target = f32::vec2(

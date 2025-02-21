@@ -57,8 +57,8 @@ fn render_grid(game_state: &mut GameState) {
     // Draw alternating colored cells for a chess board effect.
     for j in 0..GRID_H {
         for i in 0..GRID_W {
-            let x = i as f32 * cell_w;
-            let y = j as f32 * cell_h;
+            let x = i as f32 * cell_w + GRID_OFFSET_X;
+            let y = j as f32 * cell_h + GRID_OFFSET_Y;
 
             let is_dark = (i + j) % 2 == 0;
 
@@ -85,10 +85,10 @@ fn render_grid(game_state: &mut GameState) {
     for i in 0..=GRID_W {
         let x = i as f32 * cell_w;
         draw_line(
-            x,
-            0.0,
-            x,
-            TILE_SIZE_Y * GRID_H as f32,
+            x + GRID_OFFSET_X,
+            GRID_OFFSET_Y,
+            x + GRID_OFFSET_X,
+            TILE_SIZE_Y * GRID_H as f32 + GRID_OFFSET_Y,
             GRID_THICKNESS,
             color_lines,
         )
@@ -98,10 +98,10 @@ fn render_grid(game_state: &mut GameState) {
     for j in 0..=GRID_H {
         let y = j as f32 * cell_h;
         draw_line(
-            0.0,
-            y,
-            TILE_SIZE_X * GRID_W as f32,
-            y,
+            GRID_OFFSET_X,
+            y + GRID_OFFSET_Y,
+            TILE_SIZE_X * GRID_W as f32 + GRID_OFFSET_X,
+            y + GRID_OFFSET_Y,
             GRID_THICKNESS,
             color_lines,
         );
@@ -137,8 +137,8 @@ fn update_player(game_state: &mut GameState) {
 }
 
 fn render_player(game_state: &mut GameState) {
-    let x = game_state.player_tile.x as f32 * TILE_SIZE_X;
-    let y = game_state.player_tile.y as f32 * TILE_SIZE_Y;
+    let x = game_state.player_tile.x as f32 * TILE_SIZE_X + GRID_OFFSET_X;
+    let y = game_state.player_tile.y as f32 * TILE_SIZE_Y + GRID_OFFSET_Y;
 
     draw_texture(&game_state.texture_player, x, y, WHITE);
 }
