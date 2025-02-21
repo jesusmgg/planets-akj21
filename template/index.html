@@ -52,6 +52,10 @@
       canvas.style.height = newHeight + 'px';
     }
 
+    canvas.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
+
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
   </script>
