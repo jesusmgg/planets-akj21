@@ -22,10 +22,11 @@ async fn main() {
 
         render_grid(&mut game_state);
 
-        match game_state.level_active {
+        // Planets logic and rendering
+        match game_state.current_level() {
             None => {}
-            Some(i) => {
-                for planet in &game_state.levels[i].planets {
+            Some(level) => {
+                for planet in &level.planets {
                     planet.render(&game_state);
                 }
             }
@@ -42,15 +43,32 @@ fn render_grid(game_state: &mut GameState) {
     let cell_w = TILE_SIZE_X;
     let cell_h = TILE_SIZE_Y;
 
+    let grid_size_px: f32::Vec2;
+    let grid_offset: f32::Vec2;
+    let grid_tiles: IVec2;
+
+    match game_state.current_level() {
+        Some(level) => {
+            grid_size_px = level.grid_size_px();
+            grid_offset = level.grid_offset();
+            grid_tiles = level.grid_tiles;
+        }
+        None => {
+            grid_size_px = f32::Vec2::ZERO;
+            grid_offset = f32::Vec2::ZERO;
+            grid_tiles = IVec2::ZERO
+        }
+    }
+
     let color_lines = styles.colors.grey_dark;
     let color_dark = styles.colors.black_1;
     let color_light = styles.colors.black_2;
 
     // Draw alternating colored cells for a chess board effect
-    for j in 0..GRID_H {
-        for i in 0..GRID_W {
-            let x = i as f32 * cell_w + GRID_OFFSET_X;
-            let y = j as f32 * cell_h + GRID_OFFSET_Y;
+    for j in 0..grid_tiles.y {
+        for i in 0..grid_tiles.x {
+            let x = i as f32 * cell_w + grid_offset.x;
+            let y = j as f32 * cell_h + grid_offset.y;
 
             let is_dark = (i + j) % 2 == 0;
 
@@ -87,26 +105,26 @@ fn render_grid(game_state: &mut GameState) {
     }
 
     // Draw vertical grid lines
-    for i in 0..=GRID_W {
+    for i in 0..=grid_tiles.x {
         let x = i as f32 * cell_w;
         draw_line(
-            x + GRID_OFFSET_X,
-            GRID_OFFSET_Y,
-            x + GRID_OFFSET_X,
-            TILE_SIZE_Y * GRID_H as f32 + GRID_OFFSET_Y,
+            x + grid_offset.x,
+            grid_offset.y,
+            x + grid_offset.x,
+            grid_size_px.y + grid_offset.y,
             GRID_THICKNESS,
             color_lines,
         )
     }
 
     // Draw horizontal grid lines
-    for j in 0..=GRID_H {
+    for j in 0..=grid_tiles.y {
         let y = j as f32 * cell_h;
         draw_line(
-            GRID_OFFSET_X,
-            y + GRID_OFFSET_Y,
-            TILE_SIZE_X * GRID_W as f32 + GRID_OFFSET_X,
-            y + GRID_OFFSET_Y,
+            grid_offset.x,
+            y + grid_offset.y,
+            grid_size_px.x + grid_offset.x,
+            y + grid_offset.y,
             GRID_THICKNESS,
             color_lines,
         );

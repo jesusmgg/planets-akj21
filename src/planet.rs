@@ -1,6 +1,6 @@
 use macroquad::{
     color::{Color, WHITE},
-    math::IVec2,
+    math::{f32, IVec2},
     shapes::{draw_circle, draw_poly, draw_poly_lines},
     texture::draw_texture,
 };
@@ -86,8 +86,22 @@ impl Planet {
                 y = game_state.mouse_pos.y;
             }
             PlanetState::Placed(tile) => {
-                x = tile.x as f32 * TILE_SIZE_X + GRID_OFFSET_X + TILE_SIZE_X / 2.0;
-                y = tile.y as f32 * TILE_SIZE_Y + GRID_OFFSET_Y + TILE_SIZE_Y / 2.0;
+                let grid_offset: f32::Vec2;
+                let grid_tiles: IVec2;
+
+                match game_state.current_level() {
+                    Some(level) => {
+                        grid_offset = level.grid_offset();
+                        grid_tiles = level.grid_tiles;
+                    }
+                    None => {
+                        grid_offset = f32::Vec2::ZERO;
+                        grid_tiles = IVec2::ZERO
+                    }
+                }
+
+                x = tile.x as f32 * TILE_SIZE_X + grid_offset.x + TILE_SIZE_X / 2.0;
+                y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y + TILE_SIZE_Y / 2.0;
             }
         }
         draw_circle(x, y, self.size, self.color);

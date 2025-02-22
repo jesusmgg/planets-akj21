@@ -1,7 +1,7 @@
 use macroquad::{
     camera::{set_camera, Camera2D},
     math::{f32, IVec2, Rect},
-    texture::{load_texture, set_default_filter_mode, FilterMode, Texture2D},
+    texture::{set_default_filter_mode, FilterMode},
 };
 
 use crate::styles::Styles;
@@ -79,12 +79,20 @@ impl GameState {
         camera
     }
 
+    pub fn current_level(&self) -> Option<&Level> {
+        match self.level_active {
+            None => return None,
+            Some(i) => return Some(&self.levels[i]),
+        }
+    }
+
     fn create_levels(styles: &Styles) -> Vec<Level> {
         use crate::planet::PlanetState::*;
 
         let levels = vec![
             Level {
                 name: "Level 1",
+                grid_tiles: IVec2::new(7, 7),
                 planets: vec![
                     Planet::new(0b0001, Pending, 8.0, styles.colors.white),
                     Planet::new(
@@ -96,6 +104,7 @@ impl GameState {
                 ],
             },
             Level {
+                grid_tiles: IVec2::new(5, 5),
                 name: "Level 2",
                 planets: vec![
                     Planet::new(0b0000, Pending, 8.0, styles.colors.white),
@@ -111,4 +120,23 @@ impl GameState {
 pub struct Level {
     pub name: &'static str,
     pub planets: Vec<Planet>,
+    pub grid_tiles: IVec2,
+}
+
+impl Level {
+    pub fn grid_size_px(&self) -> f32::Vec2 {
+        f32::Vec2::new(
+            TILE_SIZE_X * self.grid_tiles.x as f32,
+            TILE_SIZE_Y * self.grid_tiles.y as f32,
+        )
+    }
+
+    pub fn grid_offset(&self) -> f32::Vec2 {
+        let grid_size_px = self.grid_size_px();
+
+        f32::Vec2::new(
+            (SCREEN_W - grid_size_px.x) / 2.0,
+            (SCREEN_H - grid_size_px.y) / 2.0,
+        )
+    }
 }
