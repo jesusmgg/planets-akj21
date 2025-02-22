@@ -7,6 +7,7 @@ mod text;
 use constants::*;
 use game_state::GameState;
 use macroquad::prelude::*;
+use planet::PlanetState;
 use text::draw_scaled_text;
 
 #[macroquad::main("akj-21")]
@@ -18,22 +19,81 @@ async fn main() {
             .camera
             .screen_to_world(f32::Vec2::from(mouse_position()));
 
+        update_planets(&mut game_state);
+
         clear_background(game_state.styles.colors.black_1);
 
         render_grid(&mut game_state);
-
-        // Planets logic and rendering
-        match game_state.current_level() {
-            None => {}
-            Some(level) => {
-                for planet in &level.planets {
-                    planet.render(&game_state);
-                }
-            }
-        };
+        render_planets(&game_state);
 
         next_frame().await
     }
+}
+
+fn update_planets(game_state: &mut GameState) {
+    let input_place = is_mouse_button_pressed(MouseButton::Left);
+    let input_remove = is_mouse_button_pressed(MouseButton::Right);
+
+    let tile = game_state.tile_highlighted;
+    let planet_current_index = game_state.planet_current_index;
+
+    let level = match game_state.current_level_mut() {
+        None => return,
+        Some(level) => level,
+    };
+
+    if planet_current_index >= level.planets.len() {
+        return;
+    }
+
+    // Skip indices from placed planets
+    if let PlanetState::Placed(_) = &level.planets[planet_current_index].state {
+        game_state.planet_current_index += 1;
+        return;
+    }
+
+    if input_place {
+        let mut is_tile_free = true;
+        for planet in &level.planets {
+            match planet.state {
+                PlanetState::Pending => {}
+                PlanetState::Placed(other_tile) => {
+                    if other_tile == tile {
+                        is_tile_free = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if is_tile_free {
+            let planet_current = &mut level.planets[planet_current_index];
+            planet_current.place(tile);
+            game_state.planet_current_index += 1;
+        }
+    }
+}
+
+fn render_planets(game_state: &GameState) {
+    match game_state.current_level() {
+        None => {}
+        Some(level) => {
+            let mut planet_i = 0;
+
+            for planet in &level.planets {
+                match planet.state {
+                    PlanetState::Placed(_) => planet.render(&game_state),
+                    PlanetState::Pending => {
+                        if planet_i == game_state.planet_current_index {
+                            planet.render(&game_state)
+                        }
+                    }
+                }
+
+                planet_i += 1;
+            }
+        }
+    };
 }
 
 fn render_grid(game_state: &mut GameState) {

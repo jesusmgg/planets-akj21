@@ -26,29 +26,8 @@ impl Planet {
         }
     }
 
-    pub fn try_place(&mut self, tile: IVec2, game_state: &GameState) -> bool {
-        let level_active = match game_state.level_active {
-            Some(i) => i,
-            None => return false,
-        };
-
-        for planet in &game_state.levels[level_active].planets {
-            match planet.state {
-                PlanetState::Pending => {
-                    self.state = PlanetState::Placed(tile);
-                    return true;
-                }
-                PlanetState::Placed(other_tile) => {
-                    if other_tile == tile {
-                        return false;
-                    }
-                    self.state = PlanetState::Placed(tile);
-                    return true;
-                }
-            }
-        }
-
-        false
+    pub fn place(&mut self, tile: IVec2) {
+        self.state = PlanetState::Placed(tile);
     }
 
     pub fn remove(&mut self) {
@@ -69,9 +48,6 @@ impl Planet {
     }
 
     pub fn render(&self, game_state: &GameState) {
-        let x: f32;
-        let y: f32;
-
         match self.state {
             PlanetState::Pending => {
                 draw_scaled_text(
@@ -82,8 +58,13 @@ impl Planet {
                     &game_state.styles.colors.white,
                 );
 
-                x = game_state.mouse_pos.x;
-                y = game_state.mouse_pos.y;
+                let x = game_state.mouse_pos.x;
+                let y = game_state.mouse_pos.y;
+
+                draw_circle(48.0, 48.0, self.size * 2.0, self.color);
+                self.draw_gravity_arrows(48.0, 48.0, 2.0, game_state);
+                draw_circle(x, y, self.size, self.color);
+                self.draw_gravity_arrows(x, y, 1.0, game_state);
             }
             PlanetState::Placed(tile) => {
                 let grid_offset: f32::Vec2;
@@ -100,14 +81,17 @@ impl Planet {
                     }
                 }
 
-                x = tile.x as f32 * TILE_SIZE_X + grid_offset.x + TILE_SIZE_X / 2.0;
-                y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y + TILE_SIZE_Y / 2.0;
+                let x = tile.x as f32 * TILE_SIZE_X + grid_offset.x + TILE_SIZE_X / 2.0;
+                let y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y + TILE_SIZE_Y / 2.0;
+
+                draw_circle(x, y, self.size, self.color);
+                self.draw_gravity_arrows(x, y, 1.0, game_state);
             }
         }
-        draw_circle(x, y, self.size, self.color);
+    }
 
-        // Draw gravity arrows
-        let arrow_size = 4.0;
+    fn draw_gravity_arrows(&self, x: f32, y: f32, scale: f32, game_state: &GameState) {
+        let arrow_size = 4.0 * scale;
         let arrow_color = game_state.styles.colors.red_dark;
         if self.has_gravity_up() {
             draw_poly(x, y - arrow_size, 3, arrow_size, 90.0, arrow_color);
@@ -124,6 +108,7 @@ impl Planet {
     }
 }
 
+#[derive(PartialEq)]
 pub enum PlanetState {
     Pending,
     Placed(IVec2),

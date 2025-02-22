@@ -16,7 +16,7 @@ pub struct GameState {
 
     pub levels: Vec<Level>,
     pub level_active: Option<usize>,
-    pub planet_current: usize,
+    pub planet_current_index: usize,
 }
 
 impl GameState {
@@ -31,7 +31,7 @@ impl GameState {
 
         let levels = GameState::create_levels(&styles);
         let level_active = Some(0);
-        let planet_current = 0;
+        let planet_current_index = 0;
 
         Self {
             styles,
@@ -42,7 +42,7 @@ impl GameState {
 
             level_active,
             levels,
-            planet_current,
+            planet_current_index,
         }
     }
 
@@ -79,6 +79,13 @@ impl GameState {
         camera
     }
 
+    pub fn current_level_mut(&mut self) -> Option<&mut Level> {
+        match self.level_active {
+            None => return None,
+            Some(i) => return Some(&mut self.levels[i]),
+        }
+    }
+
     pub fn current_level(&self) -> Option<&Level> {
         match self.level_active {
             None => return None,
@@ -94,13 +101,17 @@ impl GameState {
                 name: "Level 1",
                 grid_tiles: IVec2::new(7, 7),
                 planets: vec![
-                    Planet::new(0b0001, Pending, 8.0, styles.colors.white),
+                    Planet::new(0b0000, Pending, 8.0, styles.colors.white),
+                    Planet::new(0b1001, Pending, 8.0, styles.colors.yellow_1),
+                    Planet::new(0b0011, Pending, 8.0, styles.colors.grey_mid),
                     Planet::new(
                         0b1111,
                         Placed(IVec2::new(5, 5)),
                         8.0,
                         styles.colors.yellow_2,
                     ),
+                    Planet::new(0b0001, Pending, 8.0, styles.colors.yellow_4),
+                    Planet::new(0b0001, Pending, 8.0, styles.colors.red_light),
                 ],
             },
             Level {
