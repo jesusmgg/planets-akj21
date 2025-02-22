@@ -17,6 +17,7 @@ pub struct GameState {
     pub levels: Vec<Level>,
     pub level_active: Option<usize>,
     pub planet_current_index: usize,
+    pub sim_step: usize,
 }
 
 impl GameState {
@@ -32,6 +33,7 @@ impl GameState {
         let levels = GameState::create_levels(&styles);
         let level_active = Some(0);
         let planet_current_index = 0;
+        let sim_step = 0;
 
         Self {
             styles,
@@ -43,6 +45,7 @@ impl GameState {
             level_active,
             levels,
             planet_current_index,
+            sim_step,
         }
     }
 

@@ -76,7 +76,17 @@ fn update_planets(game_state: &mut GameState) {
         if is_tile_free {
             let planet_current = &mut level.planets[planet_current_index];
             planet_current.place(tile);
-            game_state.planet_current_index += 1;
+
+            let mut next_index = 0;
+            for planet in &level.planets {
+                if let PlanetState::Pending = planet.state {
+                    break;
+                }
+                next_index += 1;
+            }
+
+            game_state.planet_current_index = next_index;
+
             return;
         }
     }
