@@ -11,6 +11,8 @@
 *.*~
 *~.tiled-session~
 *.tiled-session
+*.aup3-wal
+*.aup3-shm
 
 # OS generated files
 .DS_Store
