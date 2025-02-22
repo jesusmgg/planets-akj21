@@ -32,7 +32,7 @@ impl GameState {
         let tile_highlighted = IVec2::ZERO;
 
         let levels = GameState::create_levels(&styles);
-        let level_active = Some(1);
+        let level_active = Some(0);
         let planet_current_index = 0;
 
         let sim_step = 0;
@@ -75,10 +75,10 @@ impl GameState {
         use crate::planet::PlanetState::*;
 
         let levels = vec![
-            Level {
-                name: "Level 1",
-                grid_tiles: IVec2::new(7, 7),
-                planets: vec![
+            Level::new(
+                "Level 1",
+                IVec2::new(7, 7),
+                vec![
                     Planet::new(0b0000, Pending, true, 8.0, styles.colors.white),
                     Planet::new(0b1001, Pending, true, 8.0, styles.colors.yellow_1),
                     Planet::new(0b0011, Pending, true, 8.0, styles.colors.grey_mid),
@@ -92,16 +92,16 @@ impl GameState {
                     Planet::new(0b0001, Pending, true, 8.0, styles.colors.yellow_4),
                     Planet::new(0b0001, Pending, true, 8.0, styles.colors.grey_light),
                 ],
-            },
-            Level {
-                grid_tiles: IVec2::new(6, 7),
-                name: "Level 2",
-                planets: vec![
+            ),
+            Level::new(
+                "Level 2",
+                IVec2::new(6, 7),
+                vec![
                     Planet::new(0b1111, Pending, true, 8.0, styles.colors.white),
                     Planet::new(0b1111, Pending, true, 8.0, styles.colors.grey_light),
                     Planet::new(0b0000, Pending, true, 9.0, styles.colors.yellow_1),
                 ],
-            },
+            ),
         ];
 
         levels
@@ -113,9 +113,22 @@ pub struct Level {
     pub name: &'static str,
     pub planets: Vec<Planet>,
     pub grid_tiles: IVec2,
+
+    pub is_failed: bool,
 }
 
 impl Level {
+    pub fn new(name: &'static str, grid_tiles: IVec2, planets: Vec<Planet>) -> Self {
+        let is_failed = false;
+
+        Self {
+            name,
+            planets,
+            grid_tiles,
+            is_failed,
+        }
+    }
+
     pub fn grid_size_px(&self) -> f32::Vec2 {
         f32::Vec2::new(
             TILE_SIZE_X * self.grid_tiles.x as f32,

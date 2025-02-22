@@ -113,6 +113,12 @@ impl Planet {
                     tile.y as f32 * TILE_SIZE_Y + grid_offset.y + TILE_SIZE_Y / 2.0,
                 );
 
+                // Initialize render_pos if needed
+                if self.render_pos.x < 0.0 || self.render_pos.y < 0.0 {
+                    self.render_pos.x = target.x;
+                    self.render_pos.y = target.y;
+                }
+
                 self.render_pos = self.render_pos.move_towards(target, 2.0);
 
                 draw_circle(self.render_pos.x, self.render_pos.y, self.size, self.color);
@@ -130,11 +136,20 @@ impl Planet {
                     }
                 }
 
-                draw_scaled_text(
-                    "Collision",
+                let font_size = 16.0;
+                let pos_message_y = (SCREEN_H / 2.0) - font_size;
+                draw_rectangle(
                     8.0,
-                    32.0,
-                    16.0,
+                    pos_message_y,
+                    160.0,
+                    24.0,
+                    game_state.styles.colors.red_dark,
+                );
+                draw_scaled_text(
+                    "Collision! <R> to retry",
+                    8.0,
+                    pos_message_y + font_size,
+                    font_size,
                     &game_state.styles.colors.white,
                 );
 

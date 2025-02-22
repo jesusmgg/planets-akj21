@@ -33,10 +33,30 @@ async fn main() {
         clear_background(game_state.styles.colors.black_1);
 
         render_grid(&mut game_state);
+        render_instructions(&game_state);
         render_planets(&mut game_state);
 
         next_frame().await
     }
+}
+
+fn render_instructions(game_state: &GameState) {
+    let font_size = 16.0;
+    let pos_message_y = (SCREEN_H / 2.0) - font_size;
+    draw_rectangle(
+        8.0,
+        pos_message_y,
+        148.0,
+        24.0,
+        game_state.styles.colors.yellow_1,
+    );
+    draw_scaled_text(
+        "Build a stable system",
+        8.0,
+        pos_message_y + font_size,
+        font_size,
+        &game_state.styles.colors.black_1,
+    );
 }
 
 fn update_sim(game_state: &mut GameState) {
@@ -108,10 +128,12 @@ fn update_sim(game_state: &mut GameState) {
 
                     if tile == other_tile {
                         planet.state = PlanetState::Colliding(tile);
+                        level.is_failed = true;
                         continue 'outer;
                     }
                     if tile - planet.sim_tile_delta == other_tile {
                         planet.state = PlanetState::Colliding(tile - planet.sim_tile_delta);
+                        level.is_failed = true;
                         continue 'outer;
                     }
 
@@ -137,6 +159,10 @@ fn update_planets(game_state: &mut GameState) {
         None => return,
         Some(level) => level,
     };
+
+    if level.is_failed {
+        return;
+    }
 
     let has_placed_all = planet_current_index >= level.planets.len();
 
