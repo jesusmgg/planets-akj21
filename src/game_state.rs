@@ -1,7 +1,7 @@
 use macroquad::{
     camera::{set_camera, Camera2D},
     math::{f32, IVec2, Rect},
-    texture::{set_default_filter_mode, FilterMode},
+    texture::{load_texture, set_default_filter_mode, FilterMode, Texture2D},
 };
 
 use crate::styles::Styles;
@@ -17,7 +17,11 @@ pub struct GameState {
     pub levels: Vec<Level>,
     pub level_active: Option<usize>,
     pub planet_current_index: usize,
+
     pub sim_step: usize,
+    pub sim_step_computed: usize,
+
+    pub texture_explosion_01: Texture2D,
 }
 
 impl GameState {
@@ -31,9 +35,13 @@ impl GameState {
         let tile_highlighted = IVec2::ZERO;
 
         let levels = GameState::create_levels(&styles);
-        let level_active = Some(0);
+        let level_active = Some(1);
         let planet_current_index = 0;
+
         let sim_step = 0;
+        let sim_step_computed = 0;
+
+        let texture_explosion_01 = load_texture("assets/explosion_01.png").await.unwrap();
 
         Self {
             styles,
@@ -45,7 +53,11 @@ impl GameState {
             level_active,
             levels,
             planet_current_index,
+
             sim_step,
+            sim_step_computed,
+
+            texture_explosion_01,
         }
     }
 
@@ -119,11 +131,11 @@ impl GameState {
                 ],
             },
             Level {
-                grid_tiles: IVec2::new(5, 5),
+                grid_tiles: IVec2::new(3, 3),
                 name: "Level 2",
                 planets: vec![
-                    Planet::new(0b0000, Pending, true, 8.0, styles.colors.white),
-                    Planet::new(0b0000, Pending, true, 8.0, styles.colors.grey_light),
+                    Planet::new(0b1111, Pending, true, 8.0, styles.colors.white),
+                    Planet::new(0b1111, Pending, true, 8.0, styles.colors.grey_light),
                 ],
             },
         ];

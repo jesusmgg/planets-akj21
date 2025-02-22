@@ -1,11 +1,13 @@
 use macroquad::{
-    color::Color,
+    color::{self, Color},
     math::{f32, IVec2},
     shapes::{draw_circle, draw_line, draw_poly, draw_rectangle, draw_rectangle_lines},
+    texture::draw_texture,
 };
 
 use crate::{constants::*, game_state::GameState, text::draw_scaled_text};
 
+#[derive(Clone, Copy)]
 pub struct Planet {
     pub state: PlanetState,
     pub size: f32,
@@ -15,6 +17,8 @@ pub struct Planet {
     pub gravity_field: u8,
 
     pub is_removable: bool,
+
+    pub sim_tile_delta: IVec2,
 }
 
 impl Planet {
@@ -25,6 +29,8 @@ impl Planet {
         size: f32,
         color: Color,
     ) -> Self {
+        let sim_tile_next = IVec2::ZERO;
+
         Self {
             gravity_field,
             state,
@@ -32,6 +38,8 @@ impl Planet {
 
             size,
             color,
+
+            sim_tile_delta: sim_tile_next,
         }
     }
 
@@ -96,6 +104,26 @@ impl Planet {
                 draw_circle(x, y, self.size, self.color);
                 self.draw_gravity_arrows(x, y, 1.0, game_state);
             }
+            PlanetState::Colliding(tile) => {
+                let grid_offset: f32::Vec2;
+                let grid_tiles: IVec2;
+
+                match game_state.current_level() {
+                    Some(level) => {
+                        grid_offset = level.grid_offset();
+                        grid_tiles = level.grid_tiles;
+                    }
+                    None => {
+                        grid_offset = f32::Vec2::ZERO;
+                        grid_tiles = IVec2::ZERO
+                    }
+                }
+
+                let x = tile.x as f32 * TILE_SIZE_X + grid_offset.x; // + TILE_SIZE_X / 2.0;
+                let y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y; // + TILE_SIZE_Y / 2.0;
+
+                draw_texture(&game_state.texture_explosion_01, x, y, color::WHITE);
+            }
         }
     }
 
@@ -120,7 +148,7 @@ impl Planet {
                 draw_circle(x, y, self.size * scale, self.color);
                 self.draw_gravity_arrows(x, y, scale, game_state);
             }
-            PlanetState::Placed(_) => {
+            PlanetState::Placed(_) | PlanetState::Colliding(_) => {
                 draw_circle(x, y, self.size * scale, self.color);
                 self.draw_gravity_arrows(x, y, scale, game_state);
                 let mut color_line = game_state.styles.colors.red_light;
@@ -163,8 +191,9 @@ impl Planet {
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum PlanetState {
     Pending,
     Placed(IVec2),
+    Colliding(IVec2),
 }

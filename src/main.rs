@@ -27,6 +27,8 @@ async fn main() {
 
         update_planets(&mut game_state);
 
+        update_sim(&mut game_state);
+
         clear_background(game_state.styles.colors.black_1);
 
         render_grid(&mut game_state);
@@ -34,6 +36,70 @@ async fn main() {
 
         next_frame().await
     }
+}
+
+fn update_sim(game_state: &mut GameState) {
+    // Simulation advances 1 step when a planet is placed or removed
+    if game_state.sim_step_computed >= game_state.sim_step {
+        return;
+    }
+
+    let level = match game_state.current_level_mut() {
+        None => return,
+        Some(level) => level,
+    };
+
+    let planets_clone = level.planets.clone();
+
+    let mut i: usize = 0;
+    'outer: for planet in &mut level.planets {
+        if let PlanetState::Placed(tile) = planet.state {
+            planet.sim_tile_delta.x = 0;
+            planet.sim_tile_delta.y = 0;
+
+            let mut j: usize = 0;
+            for other_planet in &planets_clone {
+                if let PlanetState::Placed(other_tile) = other_planet.state {
+                    if i == j {
+                        j += 1;
+                        continue;
+                    }
+
+                    // Collision
+                    if other_tile == tile {
+                        planet.state = PlanetState::Colliding(tile + planet.sim_tile_delta);
+                        j += 1;
+                        continue 'outer;
+                    }
+                    // Row gravity
+                    else if other_tile.y == tile.y {
+                        if other_tile.x < tile.x && other_planet.has_gravity_right() {
+                            planet.sim_tile_delta.x += -1;
+                        } else if other_tile.x > tile.x && other_planet.has_gravity_left() {
+                            planet.sim_tile_delta.x += 1;
+                        }
+                    }
+                    // Column gravity
+                    else if other_tile.x == tile.x {
+                        if other_tile.y < tile.y && other_planet.has_gravity_down() {
+                            planet.sim_tile_delta.y += -1;
+                        } else if other_tile.y > tile.y && other_planet.has_gravity_up() {
+                            planet.sim_tile_delta.y += 1;
+                        }
+                    }
+
+                    j += 1;
+                }
+            }
+
+            if let PlanetState::Placed(_) = planet.state {
+                planet.state = PlanetState::Placed(tile + planet.sim_tile_delta);
+            }
+            i += 1;
+        }
+    }
+
+    game_state.sim_step_computed += 1;
 }
 
 fn update_planets(game_state: &mut GameState) {
@@ -63,13 +129,13 @@ fn update_planets(game_state: &mut GameState) {
         let mut is_tile_free = true;
         for planet in &level.planets {
             match planet.state {
-                PlanetState::Pending => {}
                 PlanetState::Placed(other_tile) => {
                     if other_tile == tile {
                         is_tile_free = false;
                         break;
                     }
                 }
+                _ => {}
             }
         }
 
@@ -87,6 +153,9 @@ fn update_planets(game_state: &mut GameState) {
 
             game_state.planet_current_index = next_index;
 
+            // Planed was placed, advance simulation
+            game_state.sim_step += 1;
+
             return;
         }
     }
@@ -96,16 +165,20 @@ fn update_planets(game_state: &mut GameState) {
         let mut planet_index = 0;
         for planet in &mut level.planets {
             match planet.state {
-                PlanetState::Pending => {}
                 PlanetState::Placed(other_tile) => {
                     if other_tile == tile {
                         if planet.is_removable {
                             planet.remove();
                             game_state.planet_current_index = planet_index;
+
+                            // Planed was removed, advance simulation
+                            game_state.sim_step += 1;
+
                             return;
                         }
                     }
                 }
+                _ => {}
             }
 
             planet_index += 1;
@@ -123,6 +196,7 @@ fn render_planets(game_state: &GameState) {
                 planet.render_stack(planet_i, &game_state);
                 match planet.state {
                     PlanetState::Placed(_) => planet.render(&game_state),
+                    PlanetState::Colliding(_) => planet.render(&game_state),
                     PlanetState::Pending => {
                         if planet_i == game_state.planet_current_index {
                             planet.render(&game_state)
