@@ -86,15 +86,20 @@ impl GameState {
             Level {
                 name: "Level 1",
                 planets: vec![
-                    Planet::new(Pending, 8.0, styles.colors.white),
-                    Planet::new(Placed(IVec2::new(5, 5)), 8.0, styles.colors.yellow_2),
+                    Planet::new(0b0001, Pending, 8.0, styles.colors.white),
+                    Planet::new(
+                        0b1111,
+                        Placed(IVec2::new(5, 5)),
+                        8.0,
+                        styles.colors.yellow_2,
+                    ),
                 ],
             },
             Level {
                 name: "Level 2",
                 planets: vec![
-                    Planet::new(Pending, 8.0, styles.colors.white),
-                    Planet::new(Pending, 8.0, styles.colors.grey_light),
+                    Planet::new(0b0000, Pending, 8.0, styles.colors.white),
+                    Planet::new(0b0000, Pending, 8.0, styles.colors.grey_light),
                 ],
             },
         ];

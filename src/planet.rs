@@ -1,7 +1,7 @@
 use macroquad::{
     color::{Color, WHITE},
     math::IVec2,
-    shapes::draw_circle,
+    shapes::{draw_circle, draw_poly, draw_poly_lines},
     texture::draw_texture,
 };
 
@@ -11,11 +11,19 @@ pub struct Planet {
     pub state: PlanetState,
     pub size: f32,
     pub color: Color,
+
+    /// Up, down, left, right
+    pub gravity_field: u8,
 }
 
 impl Planet {
-    pub fn new(state: PlanetState, size: f32, color: Color) -> Self {
-        Self { state, size, color }
+    pub fn new(gravity_field: u8, state: PlanetState, size: f32, color: Color) -> Self {
+        Self {
+            gravity_field,
+            state,
+            size,
+            color,
+        }
     }
 
     pub fn try_place(&mut self, tile: IVec2, game_state: &GameState) -> bool {
@@ -47,7 +55,23 @@ impl Planet {
         self.state = PlanetState::Pending;
     }
 
+    pub fn has_gravity_up(&self) -> bool {
+        self.gravity_field & 0b1000 > 0
+    }
+    pub fn has_gravity_down(&self) -> bool {
+        self.gravity_field & 0b0100 > 0
+    }
+    pub fn has_gravity_left(&self) -> bool {
+        self.gravity_field & 0b0010 > 0
+    }
+    pub fn has_gravity_right(&self) -> bool {
+        self.gravity_field & 0b0001 > 0
+    }
+
     pub fn render(&self, game_state: &GameState) {
+        let x: f32;
+        let y: f32;
+
         match self.state {
             PlanetState::Pending => {
                 draw_scaled_text(
@@ -58,16 +82,30 @@ impl Planet {
                     &game_state.styles.colors.white,
                 );
 
-                let mouse_pos = &game_state.mouse_pos;
-
-                draw_circle(mouse_pos.x, mouse_pos.y, self.size, self.color);
+                x = game_state.mouse_pos.x;
+                y = game_state.mouse_pos.y;
             }
             PlanetState::Placed(tile) => {
-                let x = tile.x as f32 * TILE_SIZE_X + GRID_OFFSET_X + TILE_SIZE_X / 2.0;
-                let y = tile.y as f32 * TILE_SIZE_Y + GRID_OFFSET_Y + TILE_SIZE_Y / 2.0;
-
-                draw_circle(x, y, self.size, self.color);
+                x = tile.x as f32 * TILE_SIZE_X + GRID_OFFSET_X + TILE_SIZE_X / 2.0;
+                y = tile.y as f32 * TILE_SIZE_Y + GRID_OFFSET_Y + TILE_SIZE_Y / 2.0;
             }
+        }
+        draw_circle(x, y, self.size, self.color);
+
+        // Draw gravity arrows
+        let arrow_size = 4.0;
+        let arrow_color = game_state.styles.colors.red_dark;
+        if self.has_gravity_up() {
+            draw_poly(x, y - arrow_size, 3, arrow_size, 90.0, arrow_color);
+        }
+        if self.has_gravity_down() {
+            draw_poly(x, y + arrow_size, 3, arrow_size, -90.0, arrow_color);
+        }
+        if self.has_gravity_left() {
+            draw_poly(x - arrow_size, y, 3, arrow_size, 0.0, arrow_color);
+        }
+        if self.has_gravity_right() {
+            draw_poly(x + arrow_size, y, 3, arrow_size, -180.0, arrow_color);
         }
     }
 }

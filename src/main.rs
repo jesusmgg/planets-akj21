@@ -50,7 +50,7 @@ fn render_grid(game_state: &mut GameState) {
     let color_dark = styles.colors.black_1;
     let color_light = styles.colors.black_2;
 
-    // Draw alternating colored cells for a chess board effect.
+    // Draw alternating colored cells for a chess board effect
     for j in 0..GRID_H {
         for i in 0..GRID_W {
             let x = i as f32 * cell_w + GRID_OFFSET_X;
@@ -90,7 +90,7 @@ fn render_grid(game_state: &mut GameState) {
         }
     }
 
-    // Draw vertical grid lines.
+    // Draw vertical grid lines
     for i in 0..=GRID_W {
         let x = i as f32 * cell_w;
         draw_line(
@@ -103,7 +103,7 @@ fn render_grid(game_state: &mut GameState) {
         )
     }
 
-    // Draw horizontal grid lines.
+    // Draw horizontal grid lines
     for j in 0..=GRID_H {
         let y = j as f32 * cell_h;
         draw_line(
