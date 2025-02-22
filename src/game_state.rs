@@ -115,7 +115,7 @@ impl GameState {
                         styles.colors.yellow_2,
                     ),
                     Planet::new(0b0001, Pending, true, 8.0, styles.colors.yellow_4),
-                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.red_light),
+                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.grey_light),
                 ],
             },
             Level {

@@ -1,7 +1,7 @@
 use macroquad::{
     color::Color,
     math::{f32, IVec2},
-    shapes::{draw_circle, draw_poly},
+    shapes::{draw_circle, draw_line, draw_poly, draw_rectangle, draw_rectangle_lines},
 };
 
 use crate::{constants::*, game_state::GameState, text::draw_scaled_text};
@@ -95,6 +95,52 @@ impl Planet {
 
                 draw_circle(x, y, self.size, self.color);
                 self.draw_gravity_arrows(x, y, 1.0, game_state);
+            }
+        }
+    }
+
+    pub fn render_stack(&self, index: usize, game_state: &GameState) {
+        let x = SCREEN_W - 32.0;
+        let y = 32.0 + 36.0 * index as f32;
+        let scale = 2.0;
+
+        match self.state {
+            PlanetState::Pending => {
+                if index == game_state.planet_current_index {
+                    let mut color = game_state.styles.colors.yellow_1;
+                    color.a = 0.2;
+                    draw_rectangle(
+                        x - self.size * scale * 1.2,
+                        y - self.size * scale * 1.2,
+                        self.size * 2.0 * scale * 1.2,
+                        self.size * 2.0 * scale * 1.2,
+                        color,
+                    );
+                }
+                draw_circle(x, y, self.size * scale, self.color);
+                self.draw_gravity_arrows(x, y, scale, game_state);
+            }
+            PlanetState::Placed(_) => {
+                draw_circle(x, y, self.size * scale, self.color);
+                self.draw_gravity_arrows(x, y, scale, game_state);
+                let mut color_line = game_state.styles.colors.red_light;
+                color_line.a = 0.8;
+                draw_line(
+                    x - self.size * scale,
+                    y - self.size * scale,
+                    x + self.size * scale,
+                    y + self.size * scale,
+                    4.0,
+                    color_line,
+                );
+                draw_line(
+                    x + self.size * scale,
+                    y - self.size * scale,
+                    x - self.size * scale,
+                    y + self.size * scale,
+                    4.0,
+                    color_line,
+                );
             }
         }
     }

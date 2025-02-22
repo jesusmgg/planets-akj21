@@ -37,8 +37,8 @@ async fn main() {
 }
 
 fn update_planets(game_state: &mut GameState) {
-    let input_place = is_mouse_button_pressed(MouseButton::Left);
-    let input_remove = is_mouse_button_pressed(MouseButton::Right);
+    let input_click =
+        is_mouse_button_pressed(MouseButton::Left) || is_mouse_button_pressed(MouseButton::Right);
 
     let tile = game_state.tile_highlighted;
     let planet_current_index = game_state.planet_current_index;
@@ -59,7 +59,7 @@ fn update_planets(game_state: &mut GameState) {
     }
 
     // Place planet
-    if input_place && !has_placed_all {
+    if input_click && !has_placed_all {
         let mut is_tile_free = true;
         for planet in &level.planets {
             match planet.state {
@@ -92,7 +92,7 @@ fn update_planets(game_state: &mut GameState) {
     }
 
     // Remove planet
-    if input_remove {
+    if input_click && has_placed_all {
         let mut planet_index = 0;
         for planet in &mut level.planets {
             match planet.state {
@@ -120,6 +120,7 @@ fn render_planets(game_state: &GameState) {
             let mut planet_i = 0;
 
             for planet in &level.planets {
+                planet.render_stack(planet_i, &game_state);
                 match planet.state {
                     PlanetState::Placed(_) => planet.render(&game_state),
                     PlanetState::Pending => {
