@@ -48,17 +48,18 @@ fn update_planets(game_state: &mut GameState) {
         Some(level) => level,
     };
 
-    if planet_current_index >= level.planets.len() {
-        return;
-    }
+    let has_placed_all = planet_current_index >= level.planets.len();
 
     // Skip indices from placed planets
-    if let PlanetState::Placed(_) = &level.planets[planet_current_index].state {
-        game_state.planet_current_index += 1;
-        return;
+    if !has_placed_all {
+        if let PlanetState::Placed(_) = &level.planets[planet_current_index].state {
+            game_state.planet_current_index += 1;
+            return;
+        }
     }
 
-    if input_place {
+    // Place planet
+    if input_place && !has_placed_all {
         let mut is_tile_free = true;
         for planet in &level.planets {
             match planet.state {
@@ -76,6 +77,28 @@ fn update_planets(game_state: &mut GameState) {
             let planet_current = &mut level.planets[planet_current_index];
             planet_current.place(tile);
             game_state.planet_current_index += 1;
+            return;
+        }
+    }
+
+    // Remove planet
+    if input_remove {
+        let mut planet_index = 0;
+        for planet in &mut level.planets {
+            match planet.state {
+                PlanetState::Pending => {}
+                PlanetState::Placed(other_tile) => {
+                    if other_tile == tile {
+                        if planet.is_removable {
+                            planet.remove();
+                            game_state.planet_current_index = planet_index;
+                            return;
+                        }
+                    }
+                }
+            }
+
+            planet_index += 1;
         }
     }
 }

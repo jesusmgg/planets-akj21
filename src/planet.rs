@@ -14,13 +14,23 @@ pub struct Planet {
 
     /// Up, down, left, right
     pub gravity_field: u8,
+
+    pub is_removable: bool,
 }
 
 impl Planet {
-    pub fn new(gravity_field: u8, state: PlanetState, size: f32, color: Color) -> Self {
+    pub fn new(
+        gravity_field: u8,
+        state: PlanetState,
+        is_removable: bool,
+        size: f32,
+        color: Color,
+    ) -> Self {
         Self {
             gravity_field,
             state,
+            is_removable,
+
             size,
             color,
         }

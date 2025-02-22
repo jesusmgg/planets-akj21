@@ -101,25 +101,26 @@ impl GameState {
                 name: "Level 1",
                 grid_tiles: IVec2::new(7, 7),
                 planets: vec![
-                    Planet::new(0b0000, Pending, 8.0, styles.colors.white),
-                    Planet::new(0b1001, Pending, 8.0, styles.colors.yellow_1),
-                    Planet::new(0b0011, Pending, 8.0, styles.colors.grey_mid),
+                    Planet::new(0b0000, Pending, true, 8.0, styles.colors.white),
+                    Planet::new(0b1001, Pending, true, 8.0, styles.colors.yellow_1),
+                    Planet::new(0b0011, Pending, true, 8.0, styles.colors.grey_mid),
                     Planet::new(
                         0b1111,
                         Placed(IVec2::new(5, 5)),
+                        false,
                         8.0,
                         styles.colors.yellow_2,
                     ),
-                    Planet::new(0b0001, Pending, 8.0, styles.colors.yellow_4),
-                    Planet::new(0b0001, Pending, 8.0, styles.colors.red_light),
+                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.yellow_4),
+                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.red_light),
                 ],
             },
             Level {
                 grid_tiles: IVec2::new(5, 5),
                 name: "Level 2",
                 planets: vec![
-                    Planet::new(0b0000, Pending, 8.0, styles.colors.white),
-                    Planet::new(0b0000, Pending, 8.0, styles.colors.grey_light),
+                    Planet::new(0b0000, Pending, true, 8.0, styles.colors.white),
+                    Planet::new(0b0000, Pending, true, 8.0, styles.colors.grey_light),
                 ],
             },
         ];
