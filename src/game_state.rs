@@ -99,6 +99,7 @@ impl GameState {
                 planets: vec![
                     Planet::new(0b1111, Pending, true, 8.0, styles.colors.white),
                     Planet::new(0b1111, Pending, true, 8.0, styles.colors.grey_light),
+                    Planet::new(0b0000, Pending, true, 9.0, styles.colors.yellow_1),
                 ],
             },
         ];

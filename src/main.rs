@@ -50,10 +50,10 @@ fn update_sim(game_state: &mut GameState) {
         Some(level) => level,
     };
 
+    // Moves computation
     let planets_clone = level.planets.clone();
-
     let mut i: usize = 0;
-    'outer: for planet in &mut level.planets {
+    for planet in &mut level.planets {
         if let PlanetState::Placed(tile) = planet.state {
             planet.sim_tile_delta.x = 0;
             planet.sim_tile_delta.y = 0;
@@ -64,13 +64,6 @@ fn update_sim(game_state: &mut GameState) {
                     if i == j {
                         j += 1;
                         continue;
-                    }
-
-                    // Collision
-                    if other_tile == tile {
-                        planet.state = PlanetState::Colliding(tile + planet.sim_tile_delta);
-                        j += 1;
-                        continue 'outer;
                     }
                     // Row gravity
                     else if other_tile.y == tile.y {
@@ -96,6 +89,36 @@ fn update_sim(game_state: &mut GameState) {
             if let PlanetState::Placed(_) = planet.state {
                 planet.state = PlanetState::Placed(tile + planet.sim_tile_delta);
             }
+            i += 1;
+        }
+    }
+
+    // Collisions computation
+    let planets_clone = level.planets.clone();
+    let mut i: usize = 0;
+    'outer: for planet in &mut level.planets {
+        if let PlanetState::Placed(tile) = planet.state {
+            let mut j: usize = 0;
+            for other_planet in &planets_clone {
+                if let PlanetState::Placed(other_tile) = other_planet.state {
+                    if i == j {
+                        j += 1;
+                        continue;
+                    }
+
+                    if tile == other_tile {
+                        planet.state = PlanetState::Colliding(tile);
+                        continue 'outer;
+                    }
+                    if tile - planet.sim_tile_delta == other_tile {
+                        planet.state = PlanetState::Colliding(tile - planet.sim_tile_delta);
+                        continue 'outer;
+                    }
+
+                    j += 1;
+                }
+            }
+
             i += 1;
         }
     }

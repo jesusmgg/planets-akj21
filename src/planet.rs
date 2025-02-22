@@ -1,7 +1,7 @@
 use macroquad::{
     color::{self, Color},
     math::{f32, IVec2},
-    shapes::{draw_circle, draw_line, draw_poly, draw_rectangle, draw_rectangle_lines},
+    shapes::{draw_circle, draw_line, draw_poly, draw_rectangle},
     texture::draw_texture,
 };
 
@@ -129,6 +129,14 @@ impl Planet {
                         grid_offset = f32::Vec2::ZERO;
                     }
                 }
+
+                draw_scaled_text(
+                    "Collision",
+                    8.0,
+                    32.0,
+                    16.0,
+                    &game_state.styles.colors.white,
+                );
 
                 let x = tile.x as f32 * TILE_SIZE_X + grid_offset.x;
                 let y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y;
