@@ -1,7 +1,6 @@
 use macroquad::{
-    camera::{set_camera, Camera2D},
-    math::{f32, IVec2, Rect},
-    texture::{load_texture, set_default_filter_mode, FilterMode, Texture2D},
+    math::{f32, IVec2},
+    texture::{load_texture, Texture2D},
 };
 
 use crate::styles::Styles;

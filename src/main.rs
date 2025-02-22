@@ -116,7 +116,7 @@ fn update_sim(game_state: &mut GameState) {
     // Collisions computation
     let planets_clone = level.planets.clone();
     let mut i: usize = 0;
-    'outer: for planet in &mut level.planets {
+    for planet in &mut level.planets {
         if let PlanetState::Placed(tile) = planet.state {
             let mut j: usize = 0;
             for other_planet in &planets_clone {
@@ -129,12 +129,12 @@ fn update_sim(game_state: &mut GameState) {
                     if tile == other_tile {
                         planet.state = PlanetState::Colliding(tile);
                         level.is_failed = true;
-                        continue 'outer;
+                        continue;
                     }
                     if tile - planet.sim_tile_delta == other_tile {
                         planet.state = PlanetState::Colliding(tile - planet.sim_tile_delta);
                         level.is_failed = true;
-                        continue 'outer;
+                        continue;
                     }
 
                     j += 1;
