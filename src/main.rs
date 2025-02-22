@@ -18,10 +18,6 @@ async fn main() {
             .camera
             .screen_to_world(f32::Vec2::from(mouse_position()));
 
-        if is_key_pressed(macroquad::input::KeyCode::Q) {
-            miniquad::window::quit();
-        }
-
         clear_background(game_state.styles.colors.black_1);
 
         render_grid(&mut game_state);
