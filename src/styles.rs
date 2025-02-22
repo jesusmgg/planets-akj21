@@ -1,5 +1,6 @@
 use macroquad::color::Color;
 
+#[derive(Clone)]
 pub struct Styles {
     pub colors: Colors,
 }
@@ -30,6 +31,7 @@ impl Styles {
 }
 
 #[allow(dead_code)]
+#[derive(Clone)]
 pub struct Colors {
     pub grey_dark: Color,
     pub grey_mid: Color,

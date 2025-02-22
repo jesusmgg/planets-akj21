@@ -13,6 +13,8 @@ pub struct Planet {
     pub size: f32,
     pub color: Color,
 
+    pub render_pos: f32::Vec2,
+
     /// Up, down, left, right
     pub gravity_field: u8,
 
@@ -31,10 +33,14 @@ impl Planet {
     ) -> Self {
         let sim_tile_next = IVec2::ZERO;
 
+        let render_pos = f32::Vec2::NEG_ONE;
+
         Self {
             gravity_field,
             state,
             is_removable,
+
+            render_pos,
 
             size,
             color,
@@ -43,12 +49,19 @@ impl Planet {
         }
     }
 
-    pub fn place(&mut self, tile: IVec2) {
+    pub fn place(&mut self, tile: IVec2, grid_offset: f32::Vec2) {
         self.state = PlanetState::Placed(tile);
+
+        if self.render_pos.x < 0.0 || self.render_pos.y < 0.0 {
+            self.render_pos.x = tile.x as f32 * TILE_SIZE_X + grid_offset.x + TILE_SIZE_X / 2.0;
+            self.render_pos.y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y + TILE_SIZE_Y / 2.0;
+        }
     }
 
     pub fn remove(&mut self) {
         self.state = PlanetState::Pending;
+        self.render_pos.x = -1.0;
+        self.render_pos.y = -1.0;
     }
 
     pub fn has_gravity_up(&self) -> bool {
@@ -64,7 +77,7 @@ impl Planet {
         self.gravity_field & 0b0001 > 0
     }
 
-    pub fn render(&self, game_state: &GameState) {
+    pub fn render(&mut self, game_state: &GameState) {
         match self.state {
             PlanetState::Pending => {
                 draw_scaled_text(
@@ -85,42 +98,40 @@ impl Planet {
             }
             PlanetState::Placed(tile) => {
                 let grid_offset: f32::Vec2;
-                let grid_tiles: IVec2;
 
                 match game_state.current_level() {
                     Some(level) => {
                         grid_offset = level.grid_offset();
-                        grid_tiles = level.grid_tiles;
                     }
                     None => {
                         grid_offset = f32::Vec2::ZERO;
-                        grid_tiles = IVec2::ZERO
                     }
                 }
 
-                let x = tile.x as f32 * TILE_SIZE_X + grid_offset.x + TILE_SIZE_X / 2.0;
-                let y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y + TILE_SIZE_Y / 2.0;
+                let target = f32::Vec2::new(
+                    tile.x as f32 * TILE_SIZE_X + grid_offset.x + TILE_SIZE_X / 2.0,
+                    tile.y as f32 * TILE_SIZE_Y + grid_offset.y + TILE_SIZE_Y / 2.0,
+                );
 
-                draw_circle(x, y, self.size, self.color);
-                self.draw_gravity_arrows(x, y, 1.0, game_state);
+                self.render_pos = self.render_pos.move_towards(target, 2.0);
+
+                draw_circle(self.render_pos.x, self.render_pos.y, self.size, self.color);
+                self.draw_gravity_arrows(self.render_pos.x, self.render_pos.y, 1.0, game_state);
             }
             PlanetState::Colliding(tile) => {
                 let grid_offset: f32::Vec2;
-                let grid_tiles: IVec2;
 
                 match game_state.current_level() {
                     Some(level) => {
                         grid_offset = level.grid_offset();
-                        grid_tiles = level.grid_tiles;
                     }
                     None => {
                         grid_offset = f32::Vec2::ZERO;
-                        grid_tiles = IVec2::ZERO
                     }
                 }
 
-                let x = tile.x as f32 * TILE_SIZE_X + grid_offset.x; // + TILE_SIZE_X / 2.0;
-                let y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y; // + TILE_SIZE_Y / 2.0;
+                let x = tile.x as f32 * TILE_SIZE_X + grid_offset.x;
+                let y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y;
 
                 draw_texture(&game_state.texture_explosion_01, x, y, color::WHITE);
             }

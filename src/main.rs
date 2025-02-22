@@ -12,12 +12,13 @@ use text::draw_scaled_text;
 
 #[macroquad::main("akj-21")]
 async fn main() {
+    configure();
+    let camera = get_camera();
+
     let mut game_state = GameState::new().await;
 
     loop {
-        game_state.mouse_pos = game_state
-            .camera
-            .screen_to_world(f32::Vec2::from(mouse_position()));
+        game_state.mouse_pos = camera.screen_to_world(f32::Vec2::from(mouse_position()));
 
         // Restart level
         if is_key_pressed(KeyCode::R) {
@@ -32,7 +33,7 @@ async fn main() {
         clear_background(game_state.styles.colors.black_1);
 
         render_grid(&mut game_state);
-        render_planets(&game_state);
+        render_planets(&mut game_state);
 
         next_frame().await
     }
@@ -127,6 +128,8 @@ fn update_planets(game_state: &mut GameState) {
     // Place planet
     if input_click && !has_placed_all {
         let mut is_tile_free = true;
+        let grid_offset = level.grid_offset();
+
         for planet in &level.planets {
             match planet.state {
                 PlanetState::Placed(other_tile) => {
@@ -141,7 +144,7 @@ fn update_planets(game_state: &mut GameState) {
 
         if is_tile_free {
             let planet_current = &mut level.planets[planet_current_index];
-            planet_current.place(tile);
+            planet_current.place(tile, grid_offset);
 
             let mut next_index = 0;
             for planet in &level.planets {
@@ -186,20 +189,23 @@ fn update_planets(game_state: &mut GameState) {
     }
 }
 
-fn render_planets(game_state: &GameState) {
-    match game_state.current_level() {
+fn render_planets(game_state: &mut GameState) {
+    // TODO(Jesus): major data reestructuring needed to avoid these.
+    let game_state_clone = game_state.clone();
+
+    match game_state.current_level_mut() {
         None => {}
         Some(level) => {
             let mut planet_i = 0;
 
-            for planet in &level.planets {
-                planet.render_stack(planet_i, &game_state);
+            for planet in &mut level.planets {
+                planet.render_stack(planet_i, &game_state_clone);
                 match planet.state {
-                    PlanetState::Placed(_) => planet.render(&game_state),
-                    PlanetState::Colliding(_) => planet.render(&game_state),
+                    PlanetState::Placed(_) => planet.render(&game_state_clone),
+                    PlanetState::Colliding(_) => planet.render(&game_state_clone),
                     PlanetState::Pending => {
-                        if planet_i == game_state.planet_current_index {
-                            planet.render(&game_state)
+                        if planet_i == game_state_clone.planet_current_index {
+                            planet.render(&game_state_clone)
                         }
                     }
                 }
@@ -322,4 +328,37 @@ fn render_grid(game_state: &mut GameState) {
             color_lines,
         );
     }
+}
+
+fn configure() {
+    set_default_filter_mode(FilterMode::Nearest);
+}
+
+fn get_camera() -> Camera2D {
+    let camera_rect = Rect {
+        x: 0.0,
+        y: 0.0,
+        w: SCREEN_W,
+        h: SCREEN_H,
+    };
+
+    let camera_target = f32::vec2(
+        camera_rect.x + camera_rect.w / 2.,
+        camera_rect.y + camera_rect.h / 2.,
+    );
+    let camera_zoom = f32::vec2(1. / camera_rect.w * 2., 1. / camera_rect.h * 2.);
+
+    let camera = Camera2D {
+        target: camera_target,
+        zoom: camera_zoom,
+        offset: f32::Vec2::ZERO,
+        rotation: 0.,
+
+        render_target: None,
+        viewport: None,
+    };
+
+    set_camera(&camera);
+
+    camera
 }
