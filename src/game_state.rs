@@ -93,7 +93,7 @@ impl GameState {
         }
     }
 
-    fn create_levels(styles: &Styles) -> Vec<Level> {
+    pub fn create_levels(styles: &Styles) -> Vec<Level> {
         use crate::planet::PlanetState::*;
 
         let levels = vec![

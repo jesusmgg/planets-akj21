@@ -19,6 +19,12 @@ async fn main() {
             .camera
             .screen_to_world(f32::Vec2::from(mouse_position()));
 
+        // Restart level
+        if is_key_pressed(KeyCode::R) {
+            game_state.levels = GameState::create_levels(&game_state.styles);
+            game_state.planet_current_index = 0;
+        }
+
         update_planets(&mut game_state);
 
         clear_background(game_state.styles.colors.black_1);
