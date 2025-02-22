@@ -1,12 +1,13 @@
 mod constants;
 mod game_state;
+mod planet;
 mod styles;
 mod text;
 
 use constants::*;
 use game_state::GameState;
 use macroquad::prelude::*;
-use text::get_text_params;
+use text::draw_scaled_text;
 
 #[macroquad::main("akj-21")]
 async fn main() {
@@ -21,24 +22,18 @@ async fn main() {
             miniquad::window::quit();
         }
 
-        update_player(&mut game_state);
-
-        clear_background(Color::from_hex(0x151515));
+        clear_background(game_state.styles.colors.black_1);
 
         render_grid(&mut game_state);
-        render_player(&mut game_state);
 
-        let text_params = get_text_params(16.0, &game_state.styles.colors.white);
-        draw_text_ex(
-            format!(
-                "Tile: {}, {}",
-                game_state.tile_highlighted.x, game_state.tile_highlighted.y
-            )
-            .as_str(),
-            20.0,
-            20.0,
-            text_params,
-        );
+        match game_state.level_active {
+            None => {}
+            Some(i) => {
+                for planet in &game_state.levels[i].planets {
+                    planet.render(&game_state);
+                }
+            }
+        };
 
         next_frame().await
     }
@@ -51,8 +46,9 @@ fn render_grid(game_state: &mut GameState) {
     let cell_w = TILE_SIZE_X;
     let cell_h = TILE_SIZE_Y;
 
-    let color_dark = styles.colors.grey_mid;
-    let color_light = styles.colors.grey_light;
+    let color_lines = styles.colors.grey_dark;
+    let color_dark = styles.colors.black_1;
+    let color_light = styles.colors.black_2;
 
     // Draw alternating colored cells for a chess board effect.
     for j in 0..GRID_H {
@@ -64,6 +60,8 @@ fn render_grid(game_state: &mut GameState) {
 
             let mut color = if is_dark { color_dark } else { color_light };
 
+            draw_rectangle(x, y, cell_w, cell_h, color);
+
             if mouse_pos.x >= x
                 && mouse_pos.x < x + cell_w
                 && mouse_pos.y >= y
@@ -73,13 +71,24 @@ fn render_grid(game_state: &mut GameState) {
                 game_state.tile_highlighted.y = j;
 
                 color = styles.colors.red_dark;
-            }
+                draw_rectangle(x, y, cell_w, cell_h, color);
 
-            draw_rectangle(x, y, cell_w, cell_h, color);
+                let font_size = 12.0;
+                draw_scaled_text(
+                    format!(
+                        "{},{}",
+                        game_state.tile_highlighted.x + 1,
+                        game_state.tile_highlighted.y + 1
+                    )
+                    .as_str(),
+                    x,
+                    y + TILE_SIZE_Y - GRID_THICKNESS,
+                    font_size,
+                    &game_state.styles.colors.white,
+                );
+            }
         }
     }
-
-    let color_lines = styles.colors.black;
 
     // Draw vertical grid lines.
     for i in 0..=GRID_W {
@@ -106,39 +115,4 @@ fn render_grid(game_state: &mut GameState) {
             color_lines,
         );
     }
-}
-
-fn update_player(game_state: &mut GameState) {
-    let mut delta_x: i32 = 0;
-    let mut delta_y: i32 = 0;
-
-    if is_key_pressed(macroquad::input::KeyCode::J)
-        || is_key_pressed(macroquad::input::KeyCode::Down)
-    {
-        delta_y += 1;
-    }
-    if is_key_pressed(macroquad::input::KeyCode::K) || is_key_pressed(macroquad::input::KeyCode::Up)
-    {
-        delta_y -= 1;
-    }
-    if is_key_pressed(macroquad::input::KeyCode::L)
-        || is_key_pressed(macroquad::input::KeyCode::Right)
-    {
-        delta_x += 1;
-    }
-    if is_key_pressed(macroquad::input::KeyCode::H)
-        || is_key_pressed(macroquad::input::KeyCode::Left)
-    {
-        delta_x -= 1;
-    }
-
-    game_state.player_tile.x = clamp(game_state.player_tile.x + delta_x, 0, GRID_W - 1);
-    game_state.player_tile.y = clamp(game_state.player_tile.y + delta_y, 0, GRID_H - 1);
-}
-
-fn render_player(game_state: &mut GameState) {
-    let x = game_state.player_tile.x as f32 * TILE_SIZE_X + GRID_OFFSET_X;
-    let y = game_state.player_tile.y as f32 * TILE_SIZE_Y + GRID_OFFSET_Y;
-
-    draw_texture(&game_state.texture_player, x, y, WHITE);
 }

@@ -1,6 +1,6 @@
 use macroquad::{
     color::Color,
-    text::{camera_font_scale, TextParams},
+    text::{camera_font_scale, draw_text_ex, TextParams},
 };
 
 pub fn get_text_params(font_size: f32, color: &Color) -> TextParams {
@@ -14,4 +14,9 @@ pub fn get_text_params(font_size: f32, color: &Color) -> TextParams {
     };
 
     text_params
+}
+
+pub fn draw_scaled_text(text: &str, x: f32, y: f32, font_size: f32, color: &Color) {
+    let text_params = get_text_params(font_size, color);
+    draw_text_ex(text, x, y, text_params);
 }

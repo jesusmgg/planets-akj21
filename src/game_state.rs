@@ -4,8 +4,8 @@ use macroquad::{
     texture::{load_texture, set_default_filter_mode, FilterMode, Texture2D},
 };
 
-use crate::constants::*;
 use crate::styles::Styles;
+use crate::{constants::*, planet::Planet};
 
 pub struct GameState {
     pub styles: Styles,
@@ -14,9 +14,9 @@ pub struct GameState {
     pub mouse_pos: f32::Vec2,
     pub tile_highlighted: IVec2,
 
-    pub player_tile: IVec2,
-
-    pub texture_player: Texture2D,
+    pub levels: Vec<Level>,
+    pub level_active: Option<usize>,
+    pub planet_current: usize,
 }
 
 impl GameState {
@@ -29,9 +29,9 @@ impl GameState {
         let mouse_pos = f32::Vec2::ZERO;
         let tile_highlighted = IVec2::ZERO;
 
-        let player_tile = IVec2::ZERO;
-
-        let texture_player = load_texture("assets/el_bueno.png").await.unwrap();
+        let levels = GameState::create_levels(&styles);
+        let level_active = Some(0);
+        let planet_current = 0;
 
         Self {
             styles,
@@ -40,9 +40,9 @@ impl GameState {
             mouse_pos,
             tile_highlighted,
 
-            player_tile,
-
-            texture_player,
+            level_active,
+            levels,
+            planet_current,
         }
     }
 
@@ -78,4 +78,32 @@ impl GameState {
 
         camera
     }
+
+    fn create_levels(styles: &Styles) -> Vec<Level> {
+        use crate::planet::PlanetState::*;
+
+        let levels = vec![
+            Level {
+                name: "Level 1",
+                planets: vec![
+                    Planet::new(Pending, 8.0, styles.colors.white),
+                    Planet::new(Placed(IVec2::new(5, 5)), 8.0, styles.colors.yellow_2),
+                ],
+            },
+            Level {
+                name: "Level 2",
+                planets: vec![
+                    Planet::new(Pending, 8.0, styles.colors.white),
+                    Planet::new(Pending, 8.0, styles.colors.grey_light),
+                ],
+            },
+        ];
+
+        levels
+    }
+}
+
+pub struct Level {
+    pub name: &'static str,
+    pub planets: Vec<Planet>,
 }
