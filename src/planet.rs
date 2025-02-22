@@ -1,8 +1,7 @@
 use macroquad::{
-    color::{Color, WHITE},
+    color::Color,
     math::{f32, IVec2},
-    shapes::{draw_circle, draw_poly, draw_poly_lines},
-    texture::draw_texture,
+    shapes::{draw_circle, draw_poly},
 };
 
 use crate::{constants::*, game_state::GameState, text::draw_scaled_text};

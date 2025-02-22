@@ -123,6 +123,25 @@ fn render_planets(game_state: &GameState) {
             }
         }
     };
+
+    let planet_current_index = game_state.planet_current_index;
+
+    let level = match game_state.current_level() {
+        None => return,
+        Some(level) => level,
+    };
+
+    let has_placed_all = planet_current_index >= level.planets.len();
+
+    if has_placed_all {
+        draw_scaled_text(
+            "Remove a planet",
+            8.0,
+            16.0,
+            16.0,
+            &game_state.styles.colors.white,
+        );
+    }
 }
 
 fn render_grid(game_state: &mut GameState) {
