@@ -23,12 +23,6 @@ async fn main() {
     loop {
         game_state.mouse_pos = camera.screen_to_world(f32::Vec2::from(mouse_position()));
 
-        // Restart level
-        if is_key_pressed(KeyCode::R) {
-            game_state.levels = GameState::create_levels(&game_state.styles);
-            game_state.planet_current_index = 0;
-        }
-
         update_next_level(&mut game_state);
         setup_level(&mut game_state);
 
@@ -92,6 +86,29 @@ fn setup_level(game_state: &mut GameState) {
 }
 
 fn update_next_level(game_state: &mut GameState) {
+    let level_count = game_state.levels.len();
+    let mut level_index: isize = match game_state.level_active {
+        Some(i) => i as isize,
+        None => -1,
+    };
+
+    // Restart level
+    if is_key_pressed(KeyCode::R) {
+        game_state.levels = GameState::create_levels(&game_state.styles);
+    }
+    // Change level
+    else if is_key_pressed(KeyCode::F1) {
+        game_state.levels = GameState::create_levels(&game_state.styles);
+        level_index -= 1;
+        level_index = clamp(level_index, 0, level_count as isize - 1);
+        game_state.level_active = Some(level_index as usize);
+    } else if is_key_pressed(KeyCode::F2) {
+        game_state.levels = GameState::create_levels(&game_state.styles);
+        level_index += 1;
+        level_index = clamp(level_index, 0, level_count as isize - 1);
+        game_state.level_active = Some(level_index as usize);
+    }
+
     let level = match game_state.current_level_mut() {
         None => return,
         Some(level) => level,
