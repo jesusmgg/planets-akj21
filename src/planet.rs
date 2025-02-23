@@ -2,7 +2,7 @@ use macroquad::{
     color::{self, Color},
     math::{f32, IVec2},
     shapes::{draw_circle, draw_line, draw_poly, draw_rectangle},
-    texture::draw_texture,
+    texture::{draw_texture, draw_texture_ex, DrawTextureParams},
 };
 
 use crate::{constants::*, game_state::GameState, text::draw_scaled_text};
@@ -158,7 +158,8 @@ impl Planet {
                 let x = tile.x as f32 * TILE_SIZE_X + grid_offset.x;
                 let y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y;
 
-                draw_texture(&game_state.texture_explosion_01, x, y, color::WHITE);
+                let texture = &game_state.texture_explosion_01;
+                draw_texture(texture, x, y, color::WHITE);
             }
         }
     }
@@ -184,7 +185,7 @@ impl Planet {
                 draw_circle(x, y, self.size * scale, self.color);
                 self.draw_gravity_arrows(x, y, scale, game_state);
             }
-            PlanetState::Placed(_) | PlanetState::Colliding(_) => {
+            PlanetState::Placed(_) => {
                 draw_circle(x, y, self.size * scale, self.color);
                 self.draw_gravity_arrows(x, y, scale, game_state);
                 let mut color_line = game_state.styles.colors.red_light;
@@ -204,6 +205,44 @@ impl Planet {
                     y + self.size * scale,
                     4.0,
                     color_line,
+                );
+            }
+            PlanetState::Colliding(_) => {
+                draw_circle(x, y, self.size * scale, self.color);
+                self.draw_gravity_arrows(x, y, scale, game_state);
+                let mut color_line = game_state.styles.colors.red_light;
+                color_line.a = 0.8;
+                draw_line(
+                    x - self.size * scale,
+                    y - self.size * scale,
+                    x + self.size * scale,
+                    y + self.size * scale,
+                    4.0,
+                    color_line,
+                );
+                draw_line(
+                    x + self.size * scale,
+                    y - self.size * scale,
+                    x - self.size * scale,
+                    y + self.size * scale,
+                    4.0,
+                    color_line,
+                );
+
+                let mut color = color::WHITE;
+                color.a = 0.8;
+
+                let texture = &game_state.texture_explosion_01;
+                let texture_size = texture.size();
+                draw_texture_ex(
+                    texture,
+                    x - texture_size.x / 2.0,
+                    y - texture_size.y / 2.0,
+                    color,
+                    DrawTextureParams {
+                        dest_size: Some(f32::Vec2::new(texture_size.x, texture_size.y)),
+                        ..Default::default()
+                    },
                 );
             }
         }
