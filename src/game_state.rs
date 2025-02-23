@@ -46,7 +46,9 @@ impl GameState {
         let tile_highlighted = IVec2::ZERO;
 
         let levels = GameState::create_levels(&styles);
-        let level_active = Some(0);
+        // TODO(Jesus): Uncomment before release.
+        // let level_active = Some(0);
+        let level_active = Some(levels.len() - 1);
         let planet_current_index = 0;
 
         let sim_step = 0;
@@ -131,14 +133,14 @@ impl GameState {
                 vec![
                     Planet::new(0b0000, Pending, true, 9.0, styles.colors.yellow_1),
                     Planet::new(
-                        0b0011,
+                        0b0001,
                         Placed(IVec2::new(0, 0)),
                         false,
                         8.0,
                         styles.colors.white,
                     ),
                     Planet::new(
-                        0b0011,
+                        0b0001,
                         Placed(IVec2::new(0, 1)),
                         false,
                         8.0,
@@ -159,14 +161,14 @@ impl GameState {
                         styles.colors.white,
                     ),
                     Planet::new(
-                        0b0011,
+                        0b0001,
                         Placed(IVec2::new(0, 1)),
                         false,
                         8.0,
                         styles.colors.yellow_2,
                     ),
                     Planet::new(
-                        0b0011,
+                        0b0001,
                         Placed(IVec2::new(0, 2)),
                         false,
                         8.0,
@@ -200,8 +202,8 @@ impl GameState {
                 "5. Three planets",
                 IVec2::new(4, 4),
                 vec![
-                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.yellow_4),
                     Planet::new(0b0000, Pending, true, 9.0, styles.colors.red_light),
+                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.yellow_4),
                     Planet::new(0b0000, Pending, true, 7.0, styles.colors.red_light),
                     Planet::new(
                         0b0011,
@@ -253,6 +255,50 @@ impl GameState {
                         false,
                         8.0,
                         styles.colors.white,
+                    ),
+                ],
+            ),
+            Level::new(
+                "7. Obstacle",
+                IVec2::new(8, 2),
+                vec![
+                    Planet::new(0b0000, Pending, true, 7.0, styles.colors.white),
+                    Planet::new(0b0010, Pending, true, 9.0, styles.colors.red_light),
+                    Planet::new(
+                        0b0001,
+                        Placed(IVec2::new(0, 0)),
+                        false,
+                        8.0,
+                        styles.colors.yellow_1,
+                    ),
+                    Planet::new(
+                        0b0001,
+                        Placed(IVec2::new(0, 1)),
+                        false,
+                        8.0,
+                        styles.colors.white,
+                    ),
+                ],
+            ),
+            Level::new(
+                "8. Swap",
+                IVec2::new(6, 2),
+                vec![
+                    Planet::new(0b0000, Pending, true, 7.0, styles.colors.white),
+                    Planet::new(0b0010, Pending, true, 9.0, styles.colors.red_light),
+                    Planet::new(
+                        0b0001,
+                        Placed(IVec2::new(0, 0)),
+                        false,
+                        8.0,
+                        styles.colors.yellow_2,
+                    ),
+                    Planet::new(
+                        0b0001,
+                        Placed(IVec2::new(0, 1)),
+                        false,
+                        8.0,
+                        styles.colors.yellow_1,
                     ),
                 ],
             ),

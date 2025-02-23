@@ -107,6 +107,10 @@ fn update_next_level(game_state: &mut GameState) {
         level_index += 1;
         level_index = clamp(level_index, 0, level_count as isize - 1);
         game_state.level_active = Some(level_index as usize);
+    } else if is_key_pressed(KeyCode::F5) {
+        // TODO(Jesus): Remove before release.
+        game_state.levels = GameState::create_levels(&game_state.styles);
+        game_state.level_active = Some(level_count - 1);
     }
 
     let level = match game_state.current_level_mut() {
