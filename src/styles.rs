@@ -24,6 +24,11 @@ impl Styles {
             yellow_2: Color::from_hex(0xffec99),
             yellow_3: Color::from_hex(0xffe066),
             yellow_4: Color::from_hex(0xffd43b),
+
+            blue_1: Color::from_hex(0xd0ebff),
+            blue_2: Color::from_hex(0xa5d8ff),
+            blue_3: Color::from_hex(0x74c0fc),
+            blue_4: Color::from_hex(0x228be6),
         };
 
         Self { colors }
@@ -49,4 +54,9 @@ pub struct Colors {
     pub yellow_2: Color,
     pub yellow_3: Color,
     pub yellow_4: Color,
+
+    pub blue_1: Color,
+    pub blue_2: Color,
+    pub blue_3: Color,
+    pub blue_4: Color,
 }
