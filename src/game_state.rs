@@ -442,7 +442,43 @@ impl GameState {
                 ],
             ),
             Level::new(
-                "11. Defuse",
+                "11. Control",
+                IVec2::new(9, 4),
+                vec![
+                    Planet::new(0b1111, Pending, true, 9.0, styles.colors.white),
+                    Planet::new(0b1111, Pending, true, 9.0, styles.colors.white),
+                    Planet::new(
+                        0b1000,
+                        Placed(IVec2::new(4, 0)),
+                        true,
+                        8.0,
+                        styles.colors.yellow_2,
+                    ),
+                    Planet::new(
+                        0b0001,
+                        Placed(IVec2::new(4, 1)),
+                        true,
+                        8.0,
+                        styles.colors.yellow_1,
+                    ),
+                    Planet::new(
+                        0b0010,
+                        Placed(IVec2::new(4, 2)),
+                        true,
+                        8.0,
+                        styles.colors.yellow_1,
+                    ),
+                    Planet::new(
+                        0b0100,
+                        Placed(IVec2::new(4, 3)),
+                        true,
+                        8.0,
+                        styles.colors.yellow_1,
+                    ),
+                ],
+            ),
+            Level::new(
+                "12. Defuse",
                 IVec2::new(9, 9),
                 vec![
                     Planet::new(0b0100, Pending, true, 9.0, styles.colors.white),
@@ -478,7 +514,7 @@ impl GameState {
                 ],
             ),
             Level::new(
-                "12. Loop",
+                "13. Loop",
                 IVec2::new(7, 4),
                 vec![
                     Planet::new(0b0100, Pending, true, 9.0, styles.colors.white),
@@ -512,6 +548,19 @@ impl GameState {
                         8.0,
                         styles.colors.yellow_1,
                     ),
+                ],
+            ),
+            Level::new(
+                "14. Seven planets",
+                IVec2::new(3, 4),
+                vec![
+                    Planet::new(0b1000, Pending, true, 9.0, styles.colors.white),
+                    Planet::new(0b0001, Pending, true, 9.0, styles.colors.white),
+                    Planet::new(0b0100, Pending, true, 9.0, styles.colors.white),
+                    Planet::new(0b0000, Pending, true, 9.0, styles.colors.white),
+                    Planet::new(0b0000, Pending, true, 9.0, styles.colors.white),
+                    Planet::new(0b0111, Pending, true, 9.0, styles.colors.white),
+                    Planet::new(0b0011, Pending, true, 9.0, styles.colors.white),
                 ],
             ),
         ];
