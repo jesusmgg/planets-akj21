@@ -24,7 +24,10 @@ async fn main() {
         game_state.mouse_pos = camera.screen_to_world(f32::Vec2::from(mouse_position()));
 
         update_next_level(&mut game_state);
-        setup_level(&mut game_state);
+        if setup_level(&mut game_state) {
+            next_frame().await;
+            continue;
+        }
 
         update_planets(&mut game_state);
         update_sim(&mut game_state);
@@ -66,14 +69,15 @@ fn render_instructions(game_state: &GameState) {
     );
 }
 
-fn setup_level(game_state: &mut GameState) {
+/// Returns `true` if level was setup this frame
+fn setup_level(game_state: &mut GameState) -> bool {
     let level = match game_state.current_level_mut() {
-        None => return,
+        None => return false,
         Some(level) => level,
     };
 
     if level.is_setup {
-        return;
+        return false;
     }
 
     level.is_setup = true;
@@ -83,6 +87,8 @@ fn setup_level(game_state: &mut GameState) {
     game_state.sim_step_computed = 0;
 
     play_sound_once(&game_state.sfx_level_start_01);
+
+    true
 }
 
 fn update_next_level(game_state: &mut GameState) {
@@ -107,7 +113,11 @@ fn update_next_level(game_state: &mut GameState) {
         level_index += 1;
         level_index = clamp(level_index, 0, level_count as isize - 1);
         game_state.level_active = Some(level_index as usize);
-    } else if is_key_pressed(KeyCode::F5) {
+    } else if is_key_pressed(KeyCode::F3) {
+        // TODO(Jesus): Remove before release.
+        game_state.levels = GameState::create_levels(&game_state.styles);
+        game_state.level_active = Some(0);
+    } else if is_key_pressed(KeyCode::F4) {
         // TODO(Jesus): Remove before release.
         game_state.levels = GameState::create_levels(&game_state.styles);
         game_state.level_active = Some(level_count - 1);
@@ -126,7 +136,7 @@ fn update_next_level(game_state: &mut GameState) {
             };
 
             if current_level_i + 1 >= game_state.levels.len() {
-                // TODO(Jesus): handle last level end.
+                // TODO(Jesus): Handle last level end.
             } else {
                 // Load next level
                 game_state.level_active = Some(current_level_i + 1);
