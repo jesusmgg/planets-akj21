@@ -98,16 +98,20 @@ fn update_sim(game_state: &mut GameState) {
                     else if other_tile.y == tile.y {
                         if other_tile.x < tile.x && other_planet.has_gravity_right() {
                             planet.sim_tile_delta.x += -1;
+                            planet.sim_tile_delta.x = clamp(planet.sim_tile_delta.x, -1, 1);
                         } else if other_tile.x > tile.x && other_planet.has_gravity_left() {
                             planet.sim_tile_delta.x += 1;
+                            planet.sim_tile_delta.x = clamp(planet.sim_tile_delta.x, -1, 1);
                         }
                     }
                     // Column gravity
                     else if other_tile.x == tile.x {
                         if other_tile.y < tile.y && other_planet.has_gravity_down() {
                             planet.sim_tile_delta.y += -1;
+                            planet.sim_tile_delta.y = clamp(planet.sim_tile_delta.y, -1, 1);
                         } else if other_tile.y > tile.y && other_planet.has_gravity_up() {
                             planet.sim_tile_delta.y += 1;
+                            planet.sim_tile_delta.y = clamp(planet.sim_tile_delta.y, -1, 1);
                         }
                     }
 
@@ -116,6 +120,8 @@ fn update_sim(game_state: &mut GameState) {
             }
 
             if let PlanetState::Placed(_) = planet.state {
+                planet.sim_tile_delta.x = clamp(planet.sim_tile_delta.x, -1, 1);
+                planet.sim_tile_delta.y = clamp(planet.sim_tile_delta.y, -1, 1);
                 planet.state = PlanetState::Placed(tile + planet.sim_tile_delta);
             }
             i += 1;
