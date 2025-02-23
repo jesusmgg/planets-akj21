@@ -31,7 +31,7 @@ impl GameState {
         let tile_highlighted = IVec2::ZERO;
 
         let levels = GameState::create_levels(&styles);
-        let level_active = Some(1);
+        let level_active = Some(0);
         let planet_current_index = 0;
 
         let sim_step = 0;

@@ -395,9 +395,11 @@ fn render_grid(game_state: &mut GameState) {
                 game_state.tile_highlighted.x = i;
                 game_state.tile_highlighted.y = j;
 
-                color = styles.colors.red_dark;
+                color = styles.colors.grey_light;
+                color.a = 0.5;
                 draw_rectangle(x, y, cell_w, cell_h, color);
 
+                // TODO(Jesus): remove before shipping
                 let font_size = 12.0;
                 draw_scaled_text(
                     format!(

@@ -121,6 +121,19 @@ impl Planet {
 
                 self.render_pos = self.render_pos.move_towards(target, 2.0);
 
+                if !self.is_removable {
+                    let mut color = game_state.styles.colors.red_dark;
+                    color.a = 0.8;
+                    let cell_w = TILE_SIZE_X;
+                    let cell_h = TILE_SIZE_Y;
+                    draw_rectangle(
+                        self.render_pos.x - cell_w / 2.0,
+                        self.render_pos.y - cell_h / 2.0,
+                        cell_w,
+                        cell_h,
+                        color,
+                    );
+                }
                 draw_circle(self.render_pos.x, self.render_pos.y, self.size, self.color);
                 self.draw_gravity_arrows(self.render_pos.x, self.render_pos.y, 1.0, game_state);
             }
