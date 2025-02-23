@@ -6,7 +6,10 @@ mod text;
 
 use constants::*;
 use game_state::GameState;
-use macroquad::prelude::*;
+use macroquad::{
+    audio::{play_sound, play_sound_once, stop_sound, PlaySoundParams},
+    prelude::*,
+};
 use planet::PlanetState;
 use text::draw_scaled_text;
 
@@ -26,12 +29,12 @@ async fn main() {
             game_state.planet_current_index = 0;
         }
 
-        update_planets(&mut game_state);
+        setup_level(&mut game_state);
 
+        update_planets(&mut game_state);
         update_sim(&mut game_state);
 
         clear_background(game_state.styles.colors.black_1);
-
         render_grid(&mut game_state);
         render_instructions(&game_state);
         render_planets(&mut game_state);
@@ -66,6 +69,19 @@ fn render_instructions(game_state: &GameState) {
         font_size,
         &game_state.styles.colors.black_1,
     );
+}
+
+fn setup_level(game_state: &mut GameState) {
+    let level = match game_state.current_level_mut() {
+        None => return,
+        Some(level) => level,
+    };
+
+    if level.is_setup {
+        return;
+    }
+
+    level.is_setup = true;
 }
 
 fn update_sim(game_state: &mut GameState) {
@@ -159,6 +175,8 @@ fn update_sim(game_state: &mut GameState) {
 }
 
 fn update_win_condition(game_state: &mut GameState) {
+    let colors = game_state.styles.colors.clone();
+
     let level = match game_state.current_level_mut() {
         None => return,
         Some(level) => level,
@@ -187,14 +205,14 @@ fn update_win_condition(game_state: &mut GameState) {
             pos_message_y,
             message_size,
             16.0,
-            game_state.styles.colors.yellow_2,
+            colors.yellow_2,
         );
         draw_scaled_text(
             "Stable system!",
             pos_message_x,
             pos_message_y + font_size / 1.333,
             font_size,
-            &game_state.styles.colors.black_1,
+            &colors.black_1,
         );
 
         message_size = 118.0;
@@ -205,15 +223,42 @@ fn update_win_condition(game_state: &mut GameState) {
             pos_message_y,
             message_size,
             16.0,
-            game_state.styles.colors.yellow_2,
+            colors.yellow_2,
         );
         draw_scaled_text(
             "Click to continue",
             pos_message_x,
             pos_message_y + font_size / 1.333,
             font_size,
-            &game_state.styles.colors.black_1,
+            &colors.black_1,
         );
+    }
+
+    let mut play_sound_stable = false;
+    if level.is_stable && !level.was_stable {
+        level.was_stable = true;
+        play_sound_stable = true;
+    }
+
+    let mut play_sound_failed = false;
+    if level.is_failed && !level.was_failed {
+        level.was_failed = true;
+        play_sound_failed = true;
+    }
+
+    if play_sound_stable {
+        stop_sound(&game_state.music_level_start_01);
+        play_sound(
+            &game_state.music_level_start_01,
+            PlaySoundParams {
+                looped: false,
+                volume: 0.8,
+            },
+        );
+    }
+
+    if play_sound_failed {
+        play_sound_once(&game_state.sfx_explosion_01);
     }
 }
 
@@ -364,16 +409,23 @@ fn render_grid(game_state: &mut GameState) {
     let grid_offset: f32::Vec2;
     let grid_tiles: IVec2;
 
+    let is_stable: bool;
+    let is_failed: bool;
+
     match game_state.current_level() {
         Some(level) => {
             grid_size_px = level.grid_size_px();
             grid_offset = level.grid_offset();
             grid_tiles = level.grid_tiles;
+            is_stable = level.is_stable;
+            is_failed = level.is_failed;
         }
         None => {
             grid_size_px = f32::Vec2::ZERO;
             grid_offset = f32::Vec2::ZERO;
-            grid_tiles = IVec2::ZERO
+            grid_tiles = IVec2::ZERO;
+            is_stable = false;
+            is_failed = false;
         }
     }
 
@@ -401,24 +453,22 @@ fn render_grid(game_state: &mut GameState) {
                 game_state.tile_highlighted.x = i;
                 game_state.tile_highlighted.y = j;
 
+                if game_state.tile_highlighted_prev != game_state.tile_highlighted {
+                    game_state.tile_highlighted_prev = game_state.tile_highlighted;
+                    if !is_stable && !is_failed {
+                        play_sound(
+                            &game_state.sfx_hover_01,
+                            PlaySoundParams {
+                                looped: false,
+                                volume: 0.3,
+                            },
+                        );
+                    }
+                }
+
                 color = styles.colors.grey_light;
                 color.a = 0.5;
                 draw_rectangle(x, y, cell_w, cell_h, color);
-
-                // TODO(Jesus): remove before shipping
-                let font_size = 12.0;
-                draw_scaled_text(
-                    format!(
-                        "{},{}",
-                        game_state.tile_highlighted.x + 1,
-                        game_state.tile_highlighted.y + 1
-                    )
-                    .as_str(),
-                    x,
-                    y + TILE_SIZE_Y - GRID_THICKNESS,
-                    font_size,
-                    &game_state.styles.colors.white,
-                );
             }
         }
     }

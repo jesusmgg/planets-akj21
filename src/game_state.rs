@@ -1,4 +1,5 @@
 use macroquad::{
+    audio::{load_sound, Sound},
     math::{f32, IVec2},
     texture::{load_texture, Texture2D},
 };
@@ -11,6 +12,7 @@ pub struct GameState {
     pub styles: Styles,
 
     pub mouse_pos: f32::Vec2,
+    pub tile_highlighted_prev: IVec2,
     pub tile_highlighted: IVec2,
 
     pub levels: Vec<Level>,
@@ -21,6 +23,11 @@ pub struct GameState {
     pub sim_step_computed: usize,
 
     pub texture_explosion_01: Texture2D,
+
+    pub sfx_hover_01: Sound,
+    pub sfx_explosion_01: Sound,
+
+    pub music_level_start_01: Sound,
 }
 
 impl GameState {
@@ -28,6 +35,7 @@ impl GameState {
         let styles = Styles::new();
 
         let mouse_pos = f32::Vec2::ZERO;
+        let tile_highlighted_prev = IVec2::splat(-1);
         let tile_highlighted = IVec2::ZERO;
 
         let levels = GameState::create_levels(&styles);
@@ -39,10 +47,18 @@ impl GameState {
 
         let texture_explosion_01 = load_texture("assets/explosion_01.png").await.unwrap();
 
+        let sfx_hover_01 = load_sound("assets/sfx/hover.ogg").await.unwrap();
+        let sfx_explosion_01 = load_sound("assets/sfx/explosion_01.ogg").await.unwrap();
+
+        let music_level_start_01 = load_sound("assets/music/planet_001_short.ogg")
+            .await
+            .unwrap();
+
         Self {
             styles,
 
             mouse_pos,
+            tile_highlighted_prev,
             tile_highlighted,
 
             level_active,
@@ -53,6 +69,11 @@ impl GameState {
             sim_step_computed,
 
             texture_explosion_01,
+
+            sfx_hover_01,
+            sfx_explosion_01,
+
+            music_level_start_01,
         }
     }
 
@@ -113,22 +134,37 @@ pub struct Level {
     pub planets: Vec<Planet>,
     pub grid_tiles: IVec2,
 
+    pub was_failed: bool,
+    pub was_stable: bool,
+
     pub is_failed: bool,
     pub is_stable: bool,
+
+    pub is_setup: bool,
 }
 
 impl Level {
     pub fn new(name: &'static str, grid_tiles: IVec2, planets: Vec<Planet>) -> Self {
+        let was_failed = false;
+        let was_stable = false;
+
         let is_failed = false;
         let is_stable = false;
+
+        let is_setup = false;
 
         Self {
             name,
             planets,
             grid_tiles,
 
+            was_failed,
+            was_stable,
+
             is_failed,
             is_stable,
+
+            is_setup,
         }
     }
 
