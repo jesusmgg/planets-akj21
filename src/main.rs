@@ -204,7 +204,6 @@ fn update_next_level(game_state: &mut GameState) {
             };
 
             if current_level_i + 1 >= game_state.levels.len() {
-                // TODO(Jesus): Handle last level end.
             } else {
                 // Load next level
                 game_state.level_active = Some(current_level_i + 1);

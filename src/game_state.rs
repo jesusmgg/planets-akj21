@@ -52,9 +52,8 @@ impl GameState {
         let tile_highlighted = IVec2::ZERO;
 
         let levels = GameState::create_levels(&styles);
-        // TODO(Jesus): Uncomment before release.
-        // let level_active = Some(0);
-        let level_active = Some(levels.len() - 1);
+        let level_active = Some(0);
+        // let level_active = Some(levels.len() - 1);
         let planet_current_index = 0;
 
         let score = 0;
