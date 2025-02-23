@@ -29,6 +29,7 @@ async fn main() {
             game_state.planet_current_index = 0;
         }
 
+        update_next_level(&mut game_state);
         setup_level(&mut game_state);
 
         update_planets(&mut game_state);
@@ -83,7 +84,34 @@ fn setup_level(game_state: &mut GameState) {
 
     level.is_setup = true;
 
+    game_state.planet_current_index = 0;
+    game_state.sim_step = 0;
+    game_state.sim_step_computed = 0;
+
     play_sound_once(&game_state.sfx_level_start_01);
+}
+
+fn update_next_level(game_state: &mut GameState) {
+    let level = match game_state.current_level_mut() {
+        None => return,
+        Some(level) => level,
+    };
+
+    if level.is_stable {
+        if is_mouse_button_pressed(MouseButton::Left) || is_mouse_button_down(MouseButton::Right) {
+            let current_level_i = match game_state.level_active {
+                Some(i) => i,
+                None => return,
+            };
+
+            if current_level_i + 1 >= game_state.levels.len() {
+                // TODO(Jesus): handle last level
+            } else {
+                // Load next level
+                game_state.level_active = Some(current_level_i + 1);
+            }
+        }
+    }
 }
 
 fn update_sim(game_state: &mut GameState) {
