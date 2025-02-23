@@ -36,6 +36,8 @@ async fn main() {
         render_instructions(&game_state);
         render_planets(&mut game_state);
 
+        update_win_condition(&mut game_state);
+
         next_frame().await
     }
 }
@@ -138,11 +140,6 @@ fn update_sim(game_state: &mut GameState) {
                         level.is_failed = true;
                         continue;
                     }
-                    // if tile - planet.sim_tile_delta == other_tile {
-                    //     planet.state = PlanetState::Colliding(tile - planet.sim_tile_delta);
-                    //     level.is_failed = true;
-                    //     continue;
-                    // }
 
                     j += 1;
                 }
@@ -153,6 +150,65 @@ fn update_sim(game_state: &mut GameState) {
     }
 
     game_state.sim_step_computed += 1;
+}
+
+fn update_win_condition(game_state: &mut GameState) {
+    let level = match game_state.current_level_mut() {
+        None => return,
+        Some(level) => level,
+    };
+
+    // Check for stable system
+    for planet in &level.planets {
+        if let PlanetState::Placed(_) = planet.state {
+            level.is_stable = planet.sim_tile_delta.x == 0 && planet.sim_tile_delta.y == 0;
+        } else {
+            level.is_stable = false;
+        }
+
+        if !level.is_stable {
+            break;
+        }
+    }
+
+    if level.is_stable {
+        let font_size = 16.0;
+        let mut message_size = 96.0;
+        let mut pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
+        let mut pos_message_y = (SCREEN_H / 2.0) - font_size;
+        draw_rectangle(
+            pos_message_x,
+            pos_message_y,
+            message_size,
+            16.0,
+            game_state.styles.colors.yellow_2,
+        );
+        draw_scaled_text(
+            "Stable system!",
+            pos_message_x,
+            pos_message_y + font_size / 1.333,
+            font_size,
+            &game_state.styles.colors.black_1,
+        );
+
+        message_size = 118.0;
+        pos_message_y = (SCREEN_H / 2.0) + 16.0 - font_size;
+        pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
+        draw_rectangle(
+            pos_message_x,
+            pos_message_y,
+            message_size,
+            16.0,
+            game_state.styles.colors.yellow_2,
+        );
+        draw_scaled_text(
+            "Click to continue",
+            pos_message_x,
+            pos_message_y + font_size / 1.333,
+            font_size,
+            &game_state.styles.colors.black_1,
+        );
+    }
 }
 
 fn update_planets(game_state: &mut GameState) {
@@ -167,7 +223,7 @@ fn update_planets(game_state: &mut GameState) {
         Some(level) => level,
     };
 
-    if level.is_failed {
+    if level.is_failed || level.is_stable {
         return;
     }
 
@@ -280,7 +336,7 @@ fn render_planets(game_state: &mut GameState) {
 
     let has_placed_all = planet_current_index >= level.planets.len();
 
-    if has_placed_all {
+    if has_placed_all && !level.is_stable && !level.is_failed {
         draw_scaled_text(
             "Remove a planet",
             8.0,

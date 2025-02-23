@@ -31,7 +31,7 @@ impl GameState {
         let tile_highlighted = IVec2::ZERO;
 
         let levels = GameState::create_levels(&styles);
-        let level_active = Some(0);
+        let level_active = Some(1);
         let planet_current_index = 0;
 
         let sim_step = 0;
@@ -114,17 +114,21 @@ pub struct Level {
     pub grid_tiles: IVec2,
 
     pub is_failed: bool,
+    pub is_stable: bool,
 }
 
 impl Level {
     pub fn new(name: &'static str, grid_tiles: IVec2, planets: Vec<Planet>) -> Self {
         let is_failed = false;
+        let is_stable = false;
 
         Self {
             name,
             planets,
             grid_tiles,
+
             is_failed,
+            is_stable,
         }
     }
 
