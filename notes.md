@@ -1,6 +1,5 @@
 ## Pending
 - Level design.
-- High score feature.
 - Graphics.
 
 ## Bugs
