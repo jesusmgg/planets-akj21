@@ -327,8 +327,8 @@ fn update_win_condition(game_state: &mut GameState) {
     if level.is_stable {
         let font_size = 16.0;
         let message_size = 118.0;
-        let mut pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
-        let mut pos_message_y = (SCREEN_H / 2.0) - font_size;
+        let pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
+        let mut pos_message_y = (SCREEN_H * 0.333) - font_size;
         draw_rectangle(
             pos_message_x - 2.0,
             pos_message_y - 2.0,
@@ -351,8 +351,7 @@ fn update_win_condition(game_state: &mut GameState) {
             &colors.black_1,
         );
 
-        pos_message_y = (SCREEN_H / 2.0) + 16.0 - font_size;
-        pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
+        pos_message_y += font_size;
         draw_scaled_text(
             "Click to continue",
             pos_message_x,
@@ -577,9 +576,9 @@ fn render_level_failed(game_state: &GameState) {
 
     if level.is_failed {
         let font_size = 16.0;
-        let message_size = 158.0;
+        let message_size = 162.0;
         let pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
-        let pos_message_y = (SCREEN_H / 2.0) - font_size;
+        let pos_message_y = (SCREEN_H * 0.333) - font_size;
         draw_rectangle(
             pos_message_x - 2.0,
             pos_message_y - 2.0,
