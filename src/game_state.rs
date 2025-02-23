@@ -46,7 +46,7 @@ impl GameState {
         let tile_highlighted = IVec2::ZERO;
 
         let levels = GameState::create_levels(&styles);
-        let level_active = Some(1);
+        let level_active = Some(0);
         let planet_current_index = 0;
 
         let sim_step = 0;
@@ -116,32 +116,144 @@ impl GameState {
     pub fn create_levels(styles: &Styles) -> Vec<Level> {
         use crate::planet::PlanetState::*;
 
+        // TODO(Jesus): Make planets of different sizes.
+        // TODO(Jesus): Consider adding more colors.
+
         let levels = vec![
             Level::new(
-                "Level 1",
-                IVec2::new(10, 10),
+                "1. Planet",
+                IVec2::new(3, 3),
+                vec![Planet::new(0b0000, Pending, true, 8.0, styles.colors.white)],
+            ),
+            Level::new(
+                "2. Gravity",
+                IVec2::new(3, 3),
                 vec![
-                    Planet::new(0b0000, Pending, true, 8.0, styles.colors.white),
-                    Planet::new(0b1001, Pending, true, 8.0, styles.colors.yellow_1),
-                    Planet::new(0b0011, Pending, true, 8.0, styles.colors.grey_mid),
+                    Planet::new(0b0000, Pending, true, 9.0, styles.colors.yellow_1),
                     Planet::new(
-                        0b1111,
-                        Placed(IVec2::new(5, 5)),
+                        0b0011,
+                        Placed(IVec2::new(0, 0)),
+                        false,
+                        8.0,
+                        styles.colors.white,
+                    ),
+                    Planet::new(
+                        0b0011,
+                        Placed(IVec2::new(0, 1)),
+                        false,
+                        8.0,
+                        styles.colors.red_light,
+                    ),
+                ],
+            ),
+            Level::new(
+                "3. Direction",
+                IVec2::new(3, 3),
+                vec![
+                    Planet::new(0b0000, Pending, true, 9.0, styles.colors.red_light),
+                    Planet::new(
+                        0b0010,
+                        Placed(IVec2::new(0, 0)),
+                        false,
+                        8.0,
+                        styles.colors.white,
+                    ),
+                    Planet::new(
+                        0b0011,
+                        Placed(IVec2::new(0, 1)),
                         false,
                         8.0,
                         styles.colors.yellow_2,
                     ),
-                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.yellow_4),
-                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.grey_light),
+                    Planet::new(
+                        0b0011,
+                        Placed(IVec2::new(0, 2)),
+                        false,
+                        8.0,
+                        styles.colors.red_light,
+                    ),
                 ],
             ),
             Level::new(
-                "Level 2",
-                IVec2::new(6, 7),
+                "4. Two planets",
+                IVec2::new(3, 3),
                 vec![
-                    Planet::new(0b1111, Pending, true, 8.0, styles.colors.white),
-                    Planet::new(0b1111, Pending, true, 8.0, styles.colors.grey_light),
-                    Planet::new(0b0000, Pending, true, 9.0, styles.colors.yellow_1),
+                    Planet::new(0b0000, Pending, true, 9.0, styles.colors.red_light),
+                    Planet::new(0b0000, Pending, true, 7.0, styles.colors.white),
+                    Planet::new(
+                        0b0011,
+                        Placed(IVec2::new(0, 1)),
+                        false,
+                        8.0,
+                        styles.colors.yellow_2,
+                    ),
+                    Planet::new(
+                        0b0011,
+                        Placed(IVec2::new(0, 2)),
+                        false,
+                        8.0,
+                        styles.colors.red_light,
+                    ),
+                ],
+            ),
+            Level::new(
+                "5. Three planets",
+                IVec2::new(4, 4),
+                vec![
+                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.yellow_4),
+                    Planet::new(0b0000, Pending, true, 9.0, styles.colors.red_light),
+                    Planet::new(0b0000, Pending, true, 7.0, styles.colors.red_light),
+                    Planet::new(
+                        0b0011,
+                        Placed(IVec2::new(0, 0)),
+                        false,
+                        8.0,
+                        styles.colors.yellow_2,
+                    ),
+                    Planet::new(
+                        0b0001,
+                        Placed(IVec2::new(0, 2)),
+                        false,
+                        8.0,
+                        styles.colors.white,
+                    ),
+                    Planet::new(
+                        0b0001,
+                        Placed(IVec2::new(0, 3)),
+                        false,
+                        8.0,
+                        styles.colors.white,
+                    ),
+                ],
+            ),
+            Level::new(
+                "6. Test",
+                IVec2::new(4, 4),
+                vec![
+                    Planet::new(0b0001, Pending, true, 8.0, styles.colors.yellow_4),
+                    Planet::new(0b0011, Pending, true, 9.0, styles.colors.red_light),
+                    Planet::new(0b0000, Pending, true, 7.0, styles.colors.white),
+                    Planet::new(
+                        0b0000,
+                        Placed(IVec2::new(0, 0)),
+                        false,
+                        8.0,
+                        styles.colors.yellow_2,
+                    ),
+                    Planet::new(
+                        0b0000,
+                        Placed(IVec2::new(0, 2)),
+                        false,
+                        8.0,
+                        styles.colors.white,
+                    ),
+                    Planet::new(
+                        0b0000,
+                        Placed(IVec2::new(0, 3)),
+                        false,
+                        8.0,
+                        styles.colors.white,
+                    ),
                 ],
             ),
         ];
