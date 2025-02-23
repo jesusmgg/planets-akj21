@@ -9,10 +9,10 @@ The objective is to create stable planet systems. Each planet has different grav
 The game requires only the standard Rust toolchain with the `wasm32-unknown-unknown` target installed.
 
 ```bash
-# Produces a debug build at `target/wasm32-unknown-unknown/debug`:
+# Produces a debug build at `target/wasm32-unknown-unknown/debug`
 cargo build
 
- # Produces a production build at `target/wasm32-unknown-unknown/release`:
+ # Produces a production build at `target/wasm32-unknown-unknown/release`
 cargo build --release
 ```
 
