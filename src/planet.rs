@@ -149,25 +149,6 @@ impl Planet {
                     }
                 }
 
-                let font_size = 16.0;
-                let message_size = 158.0;
-                let pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
-                let pos_message_y = (SCREEN_H / 2.0) - font_size;
-                draw_rectangle(
-                    pos_message_x,
-                    pos_message_y,
-                    message_size,
-                    16.0,
-                    game_state.styles.colors.red_dark,
-                );
-                draw_scaled_text(
-                    "Collision! <R> to retry",
-                    pos_message_x,
-                    pos_message_y + font_size / 1.333,
-                    font_size,
-                    &game_state.styles.colors.white,
-                );
-
                 let x = tile.x as f32 * TILE_SIZE_X + grid_offset.x;
                 let y = tile.y as f32 * TILE_SIZE_Y + grid_offset.y;
 

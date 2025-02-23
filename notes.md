@@ -5,4 +5,3 @@
 
 ## Bugs
 - Remove level start sound from level 1.
-- Collision text can be behind planets.

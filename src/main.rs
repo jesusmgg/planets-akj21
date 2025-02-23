@@ -36,6 +36,7 @@ async fn main() {
         render_grid(&mut game_state);
         render_instructions(&game_state);
         render_planets(&mut game_state);
+        render_level_failed(&game_state);
 
         update_win_condition(&mut game_state);
 
@@ -473,6 +474,34 @@ fn render_planets(game_state: &mut GameState) {
             8.0,
             16.0,
             16.0,
+            &game_state.styles.colors.white,
+        );
+    }
+}
+
+fn render_level_failed(game_state: &GameState) {
+    let level = match game_state.current_level() {
+        None => return,
+        Some(level) => level,
+    };
+
+    if level.is_failed {
+        let font_size = 16.0;
+        let message_size = 158.0;
+        let pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
+        let pos_message_y = (SCREEN_H / 2.0) - font_size;
+        draw_rectangle(
+            pos_message_x,
+            pos_message_y,
+            message_size,
+            16.0,
+            game_state.styles.colors.red_dark,
+        );
+        draw_scaled_text(
+            "Collision! <R> to retry",
+            pos_message_x,
+            pos_message_y + font_size / 1.333,
+            font_size,
             &game_state.styles.colors.white,
         );
     }
