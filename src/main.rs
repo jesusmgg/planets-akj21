@@ -55,6 +55,13 @@ fn render_instructions(game_state: &GameState) {
     let pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
     let pos_message_y = 4.0;
     draw_rectangle(
+        pos_message_x - 2.0,
+        pos_message_y - 2.0,
+        message_size + 4.0,
+        16.0 + 4.0,
+        game_state.styles.colors.yellow_4,
+    );
+    draw_rectangle(
         pos_message_x,
         pos_message_y,
         message_size,
@@ -259,14 +266,21 @@ fn update_win_condition(game_state: &mut GameState) {
 
     if level.is_stable {
         let font_size = 16.0;
-        let mut message_size = 96.0;
+        let message_size = 118.0;
         let mut pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
         let mut pos_message_y = (SCREEN_H / 2.0) - font_size;
+        draw_rectangle(
+            pos_message_x - 2.0,
+            pos_message_y - 2.0,
+            message_size + 4.0,
+            32.0 + 4.0,
+            colors.yellow_4,
+        );
         draw_rectangle(
             pos_message_x,
             pos_message_y,
             message_size,
-            16.0,
+            32.0,
             colors.yellow_2,
         );
         draw_scaled_text(
@@ -277,16 +291,8 @@ fn update_win_condition(game_state: &mut GameState) {
             &colors.black_1,
         );
 
-        message_size = 118.0;
         pos_message_y = (SCREEN_H / 2.0) + 16.0 - font_size;
         pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
-        draw_rectangle(
-            pos_message_x,
-            pos_message_y,
-            message_size,
-            16.0,
-            colors.yellow_2,
-        );
         draw_scaled_text(
             "Click to continue",
             pos_message_x,
@@ -490,6 +496,13 @@ fn render_level_failed(game_state: &GameState) {
         let message_size = 158.0;
         let pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
         let pos_message_y = (SCREEN_H / 2.0) - font_size;
+        draw_rectangle(
+            pos_message_x - 2.0,
+            pos_message_y - 2.0,
+            message_size + 4.0,
+            16.0 + 4.0,
+            game_state.styles.colors.red_light,
+        );
         draw_rectangle(
             pos_message_x,
             pos_message_y,

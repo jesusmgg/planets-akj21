@@ -5,3 +5,4 @@
 
 ## Bugs
 - Remove level start sound from level 1.
+- Explosions can appear behind planets and behind planet backgrounds.
