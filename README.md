@@ -1,7 +1,7 @@
 Planets!
 ===
 
-Puzzle game made in 48 hours for the [Alakajam 21](https://alakajam.com/21st-alakajam) game jam. The theme was "Gravity".
+Puzzle game made completely from scratch in 48 hours for the [Alakajam 21](https://alakajam.com/21st-alakajam) game jam. The theme was "Gravity".
 
 The objective is to create stable planet systems. Each planet has different gravity directions that affect each other planet in range. When every planet is clear of every other planet's influence, the system is considered stable.
 
