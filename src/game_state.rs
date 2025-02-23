@@ -1,11 +1,13 @@
 use macroquad::{
     audio::{load_sound, Sound},
     math::{f32, IVec2},
+    shapes::draw_rectangle,
     texture::{load_texture, Texture2D},
+    window::clear_background,
 };
 
-use crate::styles::Styles;
 use crate::{constants::*, planet::Planet};
+use crate::{styles::Styles, text::draw_scaled_text};
 
 #[derive(Clone)]
 pub struct GameState {
@@ -39,6 +41,8 @@ pub struct GameState {
 impl GameState {
     pub async fn new() -> Self {
         let styles = Styles::new();
+
+        GameState::show_loading_screen(&styles);
 
         let mouse_pos = f32::Vec2::ZERO;
         let is_mouse_in_grid = false;
@@ -113,6 +117,35 @@ impl GameState {
             None => return None,
             Some(i) => return Some(&self.levels[i]),
         }
+    }
+
+    fn show_loading_screen(styles: &Styles) {
+        clear_background(styles.colors.black_1);
+        let font_size = 16.0;
+        let message_size = 148.0;
+        let pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
+        let pos_message_y = (SCREEN_H / 2.0) - font_size;
+        draw_rectangle(
+            pos_message_x - 2.0,
+            pos_message_y - 2.0,
+            message_size + 4.0,
+            16.0 + 4.0,
+            styles.colors.yellow_4,
+        );
+        draw_rectangle(
+            pos_message_x,
+            pos_message_y,
+            message_size,
+            16.0,
+            styles.colors.yellow_1,
+        );
+        draw_scaled_text(
+            "LOADING...",
+            pos_message_x,
+            pos_message_y + font_size / 1.333,
+            font_size,
+            &styles.colors.black_1,
+        );
     }
 
     pub fn create_levels(styles: &Styles) -> Vec<Level> {
