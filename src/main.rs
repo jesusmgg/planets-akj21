@@ -81,9 +81,9 @@ fn render_level_name(game_state: &GameState) {
 }
 
 fn render_score(game_state: &GameState) {
-    let font_size = 16.0;
+    let font_size = 12.0;
     let pos_message_x = 8.0;
-    let pos_message_y = SCREEN_H - font_size * 1.333;
+    let pos_message_y = SCREEN_H - font_size * 1.666;
     draw_scaled_text(
         format!("Score: {}", game_state.score).as_str(),
         pos_message_x,
