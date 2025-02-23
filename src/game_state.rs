@@ -28,6 +28,7 @@ pub struct GameState {
     pub sim_step_computed: usize,
 
     pub texture_explosion_01: Texture2D,
+    pub texture_background_01: Texture2D,
 
     pub sfx_hover_01: Sound,
     pub sfx_planet_place_01: Sound,
@@ -62,6 +63,7 @@ impl GameState {
         let sim_step_computed = 0;
 
         let texture_explosion_01 = load_texture("assets/explosion_01.png").await.unwrap();
+        let texture_background_01 = load_texture("assets/background.png").await.unwrap();
 
         let sfx_hover_01 = load_sound("assets/sfx/hover_02.ogg").await.unwrap();
         let sfx_planet_place_01 = load_sound("assets/sfx/planet_place_01.ogg").await.unwrap();
@@ -97,6 +99,7 @@ impl GameState {
             sim_step_computed,
 
             texture_explosion_01,
+            texture_background_01,
 
             sfx_hover_01,
             sfx_planet_place_01,

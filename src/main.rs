@@ -33,7 +33,7 @@ async fn main() {
         update_sim(&mut game_state);
         update_score(&mut game_state);
 
-        clear_background(game_state.styles.colors.black_1);
+        render_background(&game_state);
         render_grid(&mut game_state);
         render_level_name(&game_state);
         render_planets(&mut game_state);
@@ -45,6 +45,14 @@ async fn main() {
 
         next_frame().await
     }
+}
+
+fn render_background(game_state: &GameState) {
+    clear_background(game_state.styles.colors.black_1);
+
+    let mut color = WHITE;
+    color.a = 0.1;
+    draw_texture(&game_state.texture_background_01, 0.0, 0.0, color);
 }
 
 fn render_level_name(game_state: &GameState) {
@@ -658,6 +666,7 @@ fn render_grid(game_state: &mut GameState) {
             let is_dark = (i + j) % 2 == 0;
 
             let mut color = if is_dark { color_dark } else { color_light };
+            color.a = 0.7;
 
             draw_rectangle(x, y, cell_w, cell_h, color);
 
