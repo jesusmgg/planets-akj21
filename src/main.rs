@@ -306,6 +306,12 @@ fn update_sim(game_state: &mut GameState) {
 fn update_win_condition(game_state: &mut GameState) {
     let colors = game_state.styles.colors.clone();
 
+    let level_count = game_state.levels.len();
+    let is_last_level = match game_state.level_active {
+        None => false,
+        Some(i) => i >= level_count - 1,
+    };
+
     let level = match game_state.current_level_mut() {
         None => return,
         Some(level) => level,
@@ -326,7 +332,7 @@ fn update_win_condition(game_state: &mut GameState) {
 
     if level.is_stable {
         let font_size = 16.0;
-        let message_size = 118.0;
+        let message_size = 132.0;
         let pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
         let mut pos_message_y = (SCREEN_H * 0.333) - font_size;
         draw_rectangle(
@@ -352,8 +358,13 @@ fn update_win_condition(game_state: &mut GameState) {
         );
 
         pos_message_y += font_size;
+        let message = if is_last_level {
+            "Thanks for playing!"
+        } else {
+            "Click to continue"
+        };
         draw_scaled_text(
-            "Click to continue",
+            message,
             pos_message_x,
             pos_message_y + font_size / 1.333,
             font_size,
