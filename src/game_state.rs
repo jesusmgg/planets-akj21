@@ -25,9 +25,14 @@ pub struct GameState {
     pub texture_explosion_01: Texture2D,
 
     pub sfx_hover_01: Sound,
+    pub sfx_planet_place_01: Sound,
+    pub sfx_planet_place_deny_01: Sound,
+    pub sfx_planet_remove_01: Sound,
+    pub sfx_planet_remove_deny_01: Sound,
     pub sfx_explosion_01: Sound,
+    pub sfx_level_start_01: Sound,
 
-    pub music_level_start_01: Sound,
+    pub music_level_end_01: Sound,
 }
 
 impl GameState {
@@ -47,10 +52,19 @@ impl GameState {
 
         let texture_explosion_01 = load_texture("assets/explosion_01.png").await.unwrap();
 
-        let sfx_hover_01 = load_sound("assets/sfx/hover.ogg").await.unwrap();
+        let sfx_hover_01 = load_sound("assets/sfx/hover_02.ogg").await.unwrap();
+        let sfx_planet_place_01 = load_sound("assets/sfx/planet_place_01.ogg").await.unwrap();
+        let sfx_planet_place_deny_01 = load_sound("assets/sfx/planet_place_deny_01.ogg")
+            .await
+            .unwrap();
+        let sfx_planet_remove_01 = load_sound("assets/sfx/planet_remove_01.ogg").await.unwrap();
+        let sfx_planet_remove_deny_01 = load_sound("assets/sfx/planet_remove_deny_01.ogg")
+            .await
+            .unwrap();
         let sfx_explosion_01 = load_sound("assets/sfx/explosion_01.ogg").await.unwrap();
+        let sfx_level_start_01 = load_sound("assets/sfx/level_start_01.ogg").await.unwrap();
 
-        let music_level_start_01 = load_sound("assets/music/planet_001_short.ogg")
+        let music_level_end_01 = load_sound("assets/music/planet_001_short.ogg")
             .await
             .unwrap();
 
@@ -71,9 +85,14 @@ impl GameState {
             texture_explosion_01,
 
             sfx_hover_01,
+            sfx_planet_place_01,
+            sfx_planet_place_deny_01,
+            sfx_planet_remove_01,
+            sfx_planet_remove_deny_01,
             sfx_explosion_01,
+            sfx_level_start_01,
 
-            music_level_start_01,
+            music_level_end_01,
         }
     }
 

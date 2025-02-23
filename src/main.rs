@@ -82,6 +82,8 @@ fn setup_level(game_state: &mut GameState) {
     }
 
     level.is_setup = true;
+
+    play_sound_once(&game_state.sfx_level_start_01);
 }
 
 fn update_sim(game_state: &mut GameState) {
@@ -247,9 +249,9 @@ fn update_win_condition(game_state: &mut GameState) {
     }
 
     if play_sound_stable {
-        stop_sound(&game_state.music_level_start_01);
+        stop_sound(&game_state.music_level_end_01);
         play_sound(
-            &game_state.music_level_start_01,
+            &game_state.music_level_end_01,
             PlaySoundParams {
                 looped: false,
                 volume: 0.8,
@@ -263,6 +265,11 @@ fn update_win_condition(game_state: &mut GameState) {
 }
 
 fn update_planets(game_state: &mut GameState) {
+    let mut play_sound_place = false;
+    let mut play_sound_place_deny = false;
+    let mut play_sound_remove = false;
+    let mut play_sound_remove_deny = false;
+
     let input_click =
         is_mouse_button_pressed(MouseButton::Left) || is_mouse_button_pressed(MouseButton::Right);
 
@@ -320,14 +327,14 @@ fn update_planets(game_state: &mut GameState) {
             game_state.planet_current_index = next_index;
 
             // Planed was placed, advance simulation
+            play_sound_place = true;
             game_state.sim_step += 1;
-
-            return;
+        } else {
+            play_sound_place_deny = true;
         }
     }
-
     // Remove planet
-    if input_click && has_placed_all {
+    else if input_click && has_placed_all {
         let mut planet_index = 0;
         for planet in &mut level.planets {
             match planet.state {
@@ -338,9 +345,12 @@ fn update_planets(game_state: &mut GameState) {
                             game_state.planet_current_index = planet_index;
 
                             // Planed was removed, advance simulation
+                            play_sound_remove = true;
                             game_state.sim_step += 1;
 
-                            return;
+                            break;
+                        } else {
+                            play_sound_remove_deny = true;
                         }
                     }
                 }
@@ -349,6 +359,16 @@ fn update_planets(game_state: &mut GameState) {
 
             planet_index += 1;
         }
+    }
+
+    if play_sound_place {
+        play_sound_once(&game_state.sfx_planet_place_01);
+    } else if play_sound_place_deny {
+        play_sound_once(&game_state.sfx_planet_place_deny_01);
+    } else if play_sound_remove {
+        play_sound_once(&game_state.sfx_planet_remove_01);
+    } else if play_sound_remove_deny {
+        play_sound_once(&game_state.sfx_planet_remove_deny_01);
     }
 }
 
@@ -460,7 +480,7 @@ fn render_grid(game_state: &mut GameState) {
                             &game_state.sfx_hover_01,
                             PlaySoundParams {
                                 looped: false,
-                                volume: 0.3,
+                                volume: 0.1,
                             },
                         );
                     }
