@@ -22,6 +22,8 @@ pub struct GameState {
     pub level_active: Option<usize>,
     pub planet_current_index: usize,
 
+    pub score: i32,
+
     pub sim_step: usize,
     pub sim_step_computed: usize,
 
@@ -55,6 +57,8 @@ impl GameState {
         let level_active = Some(levels.len() - 1);
         let planet_current_index = 0;
 
+        let score = 0;
+
         let sim_step = 0;
         let sim_step_computed = 0;
 
@@ -87,6 +91,8 @@ impl GameState {
             level_active,
             levels,
             planet_current_index,
+
+            score,
 
             sim_step,
             sim_step_computed,
@@ -516,7 +522,10 @@ impl GameState {
 pub struct Level {
     pub name: &'static str,
     pub planets: Vec<Planet>,
+    pub planets_original: Vec<Planet>,
     pub grid_tiles: IVec2,
+
+    pub score: i32,
 
     pub was_failed: bool,
     pub was_stable: bool,
@@ -537,10 +546,17 @@ impl Level {
 
         let is_setup = false;
 
+        let score = 0;
+
+        let planets_original = planets.clone();
+
         Self {
             name,
             planets,
+            planets_original,
             grid_tiles,
+
+            score,
 
             was_failed,
             was_stable,
@@ -566,5 +582,19 @@ impl Level {
             (SCREEN_W - grid_size_px.x) / 2.0,
             (SCREEN_H - grid_size_px.y) / 2.0,
         )
+    }
+
+    pub fn reset(&mut self) {
+        self.planets = self.planets_original.clone();
+
+        self.was_failed = false;
+        self.was_stable = false;
+
+        self.is_failed = false;
+        self.is_stable = false;
+
+        self.is_setup = false;
+
+        self.score = 0;
     }
 }

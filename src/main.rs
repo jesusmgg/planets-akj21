@@ -31,12 +31,15 @@ async fn main() {
 
         update_planets(&mut game_state);
         update_sim(&mut game_state);
+        update_score(&mut game_state);
 
         clear_background(game_state.styles.colors.black_1);
         render_grid(&mut game_state);
-        render_instructions(&game_state);
+        render_level_name(&game_state);
         render_planets(&mut game_state);
         render_level_failed(&game_state);
+        render_help(&game_state);
+        render_score(&game_state);
 
         update_win_condition(&mut game_state);
 
@@ -44,7 +47,7 @@ async fn main() {
     }
 }
 
-fn render_instructions(game_state: &GameState) {
+fn render_level_name(game_state: &GameState) {
     let level = match game_state.current_level() {
         None => return,
         Some(level) => level,
@@ -74,6 +77,32 @@ fn render_instructions(game_state: &GameState) {
         pos_message_y + font_size / 1.333,
         font_size,
         &game_state.styles.colors.black_1,
+    );
+}
+
+fn render_score(game_state: &GameState) {
+    let font_size = 16.0;
+    let pos_message_x = 8.0;
+    let pos_message_y = SCREEN_H - font_size * 1.333;
+    draw_scaled_text(
+        format!("Score: {}", game_state.score).as_str(),
+        pos_message_x,
+        pos_message_y,
+        font_size,
+        &game_state.styles.colors.white,
+    );
+}
+
+fn render_help(game_state: &GameState) {
+    let font_size = 12.0;
+    let pos_message_x = 8.0;
+    let pos_message_y = SCREEN_H - font_size * 0.666;
+    draw_scaled_text(
+        "<R> to retry level",
+        pos_message_x,
+        pos_message_y,
+        font_size,
+        &game_state.styles.colors.grey_mid,
     );
 }
 
@@ -108,27 +137,58 @@ fn update_next_level(game_state: &mut GameState) {
 
     // Restart level
     if is_key_pressed(KeyCode::R) {
-        game_state.levels = GameState::create_levels(&game_state.styles);
+        match game_state.current_level_mut() {
+            None => {}
+            Some(level) => level.reset(),
+        }
     }
     // Change level
     else if is_key_pressed(KeyCode::F1) {
-        game_state.levels = GameState::create_levels(&game_state.styles);
+        match game_state.current_level_mut() {
+            None => {}
+            Some(level) => level.reset(),
+        }
         level_index -= 1;
         level_index = clamp(level_index, 0, level_count as isize - 1);
         game_state.level_active = Some(level_index as usize);
+        match game_state.current_level_mut() {
+            None => {}
+            Some(level) => level.reset(),
+        }
     } else if is_key_pressed(KeyCode::F2) {
-        game_state.levels = GameState::create_levels(&game_state.styles);
+        match game_state.current_level_mut() {
+            None => {}
+            Some(level) => level.reset(),
+        }
         level_index += 1;
         level_index = clamp(level_index, 0, level_count as isize - 1);
         game_state.level_active = Some(level_index as usize);
+        match game_state.current_level_mut() {
+            None => {}
+            Some(level) => level.reset(),
+        }
     } else if is_key_pressed(KeyCode::F3) {
         // TODO(Jesus): Remove before release.
-        game_state.levels = GameState::create_levels(&game_state.styles);
+        match game_state.current_level_mut() {
+            None => {}
+            Some(level) => level.reset(),
+        }
         game_state.level_active = Some(0);
+        match game_state.current_level_mut() {
+            None => {}
+            Some(level) => level.reset(),
+        }
     } else if is_key_pressed(KeyCode::F4) {
         // TODO(Jesus): Remove before release.
-        game_state.levels = GameState::create_levels(&game_state.styles);
+        match game_state.current_level_mut() {
+            None => {}
+            Some(level) => level.reset(),
+        }
         game_state.level_active = Some(level_count - 1);
+        match game_state.current_level_mut() {
+            None => {}
+            Some(level) => level.reset(),
+        }
     }
 
     let level = match game_state.current_level_mut() {
@@ -330,11 +390,25 @@ fn update_win_condition(game_state: &mut GameState) {
     }
 }
 
+fn update_score(game_state: &mut GameState) {
+    // Total score
+    let mut score = 0;
+    for level in &game_state.levels {
+        if level.is_stable {
+            score += 100 + level.score;
+        }
+    }
+
+    game_state.score = score;
+}
+
 fn update_planets(game_state: &mut GameState) {
     let mut play_sound_place = false;
     let mut play_sound_place_deny = false;
     let mut play_sound_remove = false;
     let mut play_sound_remove_deny = false;
+
+    let mut score_delta = 0;
 
     let input_click =
         is_mouse_button_pressed(MouseButton::Left) || is_mouse_button_pressed(MouseButton::Right);
@@ -395,6 +469,7 @@ fn update_planets(game_state: &mut GameState) {
 
             // Planed was placed, advance simulation
             play_sound_place = true;
+            score_delta = -1;
             game_state.sim_step += 1;
         } else if is_mouse_in_grid {
             play_sound_place_deny = true;
@@ -413,6 +488,7 @@ fn update_planets(game_state: &mut GameState) {
 
                             // Planed was removed, advance simulation
                             play_sound_remove = true;
+                            score_delta = -1;
                             game_state.sim_step += 1;
 
                             break;
@@ -437,6 +513,14 @@ fn update_planets(game_state: &mut GameState) {
     } else if play_sound_remove_deny {
         play_sound_once(&game_state.sfx_planet_remove_deny_01);
     }
+
+    // New borrow for score
+    let level = match game_state.current_level_mut() {
+        None => return,
+        Some(level) => level,
+    };
+
+    level.score += score_delta;
 }
 
 fn render_planets(game_state: &mut GameState) {
