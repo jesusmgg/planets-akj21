@@ -105,7 +105,7 @@ fn update_next_level(game_state: &mut GameState) {
             };
 
             if current_level_i + 1 >= game_state.levels.len() {
-                // TODO(Jesus): handle last level
+                // TODO(Jesus): handle last level end.
             } else {
                 // Load next level
                 game_state.level_active = Some(current_level_i + 1);
@@ -300,6 +300,7 @@ fn update_planets(game_state: &mut GameState) {
 
     let input_click =
         is_mouse_button_pressed(MouseButton::Left) || is_mouse_button_pressed(MouseButton::Right);
+    let is_mouse_in_grid = game_state.is_mouse_in_grid;
 
     let tile = game_state.tile_highlighted;
     let planet_current_index = game_state.planet_current_index;
@@ -340,7 +341,7 @@ fn update_planets(game_state: &mut GameState) {
             }
         }
 
-        if is_tile_free {
+        if is_tile_free && is_mouse_in_grid {
             let planet_current = &mut level.planets[planet_current_index];
             planet_current.place(tile, grid_offset);
 
@@ -357,12 +358,12 @@ fn update_planets(game_state: &mut GameState) {
             // Planed was placed, advance simulation
             play_sound_place = true;
             game_state.sim_step += 1;
-        } else {
+        } else if is_mouse_in_grid {
             play_sound_place_deny = true;
         }
     }
     // Remove planet
-    else if input_click && has_placed_all {
+    else if input_click && has_placed_all && is_mouse_in_grid {
         let mut planet_index = 0;
         for planet in &mut level.planets {
             match planet.state {
@@ -377,7 +378,7 @@ fn update_planets(game_state: &mut GameState) {
                             game_state.sim_step += 1;
 
                             break;
-                        } else {
+                        } else if is_mouse_in_grid {
                             play_sound_remove_deny = true;
                         }
                     }
@@ -482,6 +483,7 @@ fn render_grid(game_state: &mut GameState) {
     let color_light = styles.colors.black_2;
 
     // Draw alternating colored cells for a chess board effect
+    game_state.is_mouse_in_grid = false;
     for j in 0..grid_tiles.y {
         for i in 0..grid_tiles.x {
             let x = i as f32 * cell_w + grid_offset.x;
@@ -500,6 +502,7 @@ fn render_grid(game_state: &mut GameState) {
             {
                 game_state.tile_highlighted.x = i;
                 game_state.tile_highlighted.y = j;
+                game_state.is_mouse_in_grid = true;
 
                 if game_state.tile_highlighted_prev != game_state.tile_highlighted {
                     game_state.tile_highlighted_prev = game_state.tile_highlighted;

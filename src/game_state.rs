@@ -12,6 +12,7 @@ pub struct GameState {
     pub styles: Styles,
 
     pub mouse_pos: f32::Vec2,
+    pub is_mouse_in_grid: bool,
     pub tile_highlighted_prev: IVec2,
     pub tile_highlighted: IVec2,
 
@@ -40,11 +41,12 @@ impl GameState {
         let styles = Styles::new();
 
         let mouse_pos = f32::Vec2::ZERO;
+        let is_mouse_in_grid = false;
         let tile_highlighted_prev = IVec2::splat(-1);
         let tile_highlighted = IVec2::ZERO;
 
         let levels = GameState::create_levels(&styles);
-        let level_active = Some(0);
+        let level_active = Some(1);
         let planet_current_index = 0;
 
         let sim_step = 0;
@@ -72,6 +74,7 @@ impl GameState {
             styles,
 
             mouse_pos,
+            is_mouse_in_grid,
             tile_highlighted_prev,
             tile_highlighted,
 
