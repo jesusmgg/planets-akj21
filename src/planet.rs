@@ -98,13 +98,16 @@ impl Planet {
             }
             PlanetState::Placed(tile) => {
                 let grid_offset: f32::Vec2;
+                let is_failed: bool;
 
                 match game_state.current_level() {
                     Some(level) => {
                         grid_offset = level.grid_offset();
+                        is_failed = level.is_failed;
                     }
                     None => {
                         grid_offset = f32::Vec2::ZERO;
+                        is_failed = false;
                     }
                 }
 
@@ -121,7 +124,7 @@ impl Planet {
 
                 self.render_pos = self.render_pos.move_towards(target, 2.0);
 
-                if !self.is_removable {
+                if !self.is_removable && !is_failed {
                     let mut color = game_state.styles.colors.red_dark;
                     color.a = 0.8;
                     let cell_w = TILE_SIZE_X;
