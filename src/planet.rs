@@ -137,18 +137,20 @@ impl Planet {
                 }
 
                 let font_size = 16.0;
+                let message_size = 158.0;
+                let pos_message_x = SCREEN_W / 2.0 - message_size / 2.0;
                 let pos_message_y = (SCREEN_H / 2.0) - font_size;
                 draw_rectangle(
-                    8.0,
+                    pos_message_x,
                     pos_message_y,
-                    160.0,
-                    24.0,
+                    message_size,
+                    16.0,
                     game_state.styles.colors.red_dark,
                 );
                 draw_scaled_text(
                     "Collision! <R> to retry",
-                    8.0,
-                    pos_message_y + font_size,
+                    pos_message_x,
+                    pos_message_y + font_size / 1.333,
                     font_size,
                     &game_state.styles.colors.white,
                 );

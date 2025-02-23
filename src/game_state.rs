@@ -76,7 +76,7 @@ impl GameState {
         let levels = vec![
             Level::new(
                 "Level 1",
-                IVec2::new(7, 7),
+                IVec2::new(10, 10),
                 vec![
                     Planet::new(0b0000, Pending, true, 8.0, styles.colors.white),
                     Planet::new(0b1001, Pending, true, 8.0, styles.colors.yellow_1),
